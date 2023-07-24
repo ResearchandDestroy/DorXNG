@@ -3,7 +3,11 @@ DorXNG is a next generation solution for harvesting OSINT data using advanced se
 
 Our SearXNG implementation routes all search queries over the Tor network while refreshing circuits every ten second to evade search engine restrictions and increase anonymity. The DorXNG client application is written in Python3, and interacts with the SearXNG API to issue search queries concurrently. The resulting search results are stored in a SQL database.
 
+[Buy Us A Beer! 🍺](https://www.buymeacoffee.com/researchanddestroy)
+
 # Setup
+
+LINUX ONLY ** Sorry Normies **
 
 Install DorXNG
 
@@ -20,6 +24,13 @@ When starting multiple containers wait 10 seconds between starting each one.
 
 ```
 docker run researchanddestroy/searxng:latest
+```
+
+If you would like to build the container yourself
+```
+git clone https://github.com/researchanddestroy/searxng **The URL must be all lowercase for the build process to complete**
+cd searxng
+make docker.build
 ```
 
 Start Issuing Search Queries
