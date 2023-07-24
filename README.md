@@ -1,15 +1,15 @@
 # DorXNG
-DorXNG is a next generation solution for harvesting OSINT data using advanced search engine operators through multiple upstream search providers. On the backend it leverages a heavily modified and containerized image of SearXNG, a self-host, hackable, privacy focused, meta-search engine.
+DorXNG is a next generation solution for harvesting OSINT data using advanced search engine operators through multiple upstream search providers. On the backend it leverages a heavily modified and containerized image of [SearXNG](https://docs.searxng.org/), a self-host, hackable, privacy focused, meta-search engine.
 
-Our SearXNG implementation routes all search queries over the Tor network while refreshing circuits every ten second to evade search engine restrictions and increase anonymity. The DorXNG client application is written in Python3, and interacts with the SearXNG API to issue search queries concurrently. The resulting search results are stored in a SQL database.
+Our SearXNG implementation routes all search queries over the [Tor](https://www.torproject.org/) network while refreshing circuits every ten second to evade search engine restrictions and increase anonymity. The DorXNG client application is written in Python3, and interacts with the SearXNG API to issue search queries concurrently. The resulting search results are stored in a SQL database.
 
-##### Please DO NOT use the DorXNG client application against any other public SearXNG instances.
+#### Please DO NOT use the DorXNG client application against any public SearXNG instances.
 
 [Buy Us A Beer! 🍺](https://www.buymeacoffee.com/researchanddestroy)
 
 # Setup
 
-LINUX ONLY ** Sorry Normies **
+#### LINUX ONLY ** Sorry Normies **
 
 Install DorXNG
 
@@ -22,7 +22,7 @@ pip install -r requirements.txt
 
 Download and Run Our Custom SearXNG Docker Container (at least one). Multiple SearXNG instances can be used. Use the --serverlist option with DorXNG.
 
-When starting multiple containers wait 10 seconds between starting each one.
+#### When starting multiple containers wait 10 seconds between starting each one.
 ```
 docker run researchanddestroy/searxng:latest
 ```
