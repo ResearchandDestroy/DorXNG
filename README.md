@@ -46,7 +46,7 @@ Query the DorXNG Database
 
 # Tips
 
-Sometimes you will hit a Tor exit node that is already shunted by upstream search providers. Not to worry.. Just keep firing off queries. 😉
+Sometimes you will hit a Tor exit node that is already shunted by upstream search providers. Not to worry... Just keep firing off queries. 😉
 
 Keep your DorXNG SQL database file and rerun your command, or use the --loop switch to iterate the main function repeatedly. 🔁
 
