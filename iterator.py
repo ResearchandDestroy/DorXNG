@@ -14,7 +14,6 @@ def page_iterator(args, database_name, database_file, page_iteration_mode,
 
     # Check Verbosity
     features.verbosity(args, page_iteration_mode,
-                       page_iteration_number, search_query,
                        query_list, server_list)
 
     # If Page Iteration Mode is Disabled
