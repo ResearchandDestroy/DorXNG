@@ -31,7 +31,7 @@ If you would like to build the container yourself:
 ```
 git clone https://github.com/researchanddestroy/searxng **The URL must be all lowercase for the build process to complete**
 cd searxng
-make docker.build
+DOCKER_BUILDKIT=1 make docker.build
 docker images
 docker run <image-id>
 ```
