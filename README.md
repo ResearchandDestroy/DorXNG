@@ -16,6 +16,8 @@ pip install -r requirements.txt
 
 Download and Run Our Custom SearXNG Docker Container (at least one). Multiple SearXNG instances can be used. Use the --serverlist option with DorXNG.
 
+When starting multiple containers wait 10 seconds between starting each one.
+
 ```
 docker run researchanddestroy/searxng:latest
 ```
