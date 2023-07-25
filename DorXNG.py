@@ -38,7 +38,7 @@ import data_handling
 def main():
 
     # Increase Maximum Recursion Depth
-    sys.setrecursionlimit(10 ** 10)
+    sys.setrecursionlimit(10 ** 9)
     
     # Print Banner
     features.banner()
