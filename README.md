@@ -52,7 +52,7 @@ Sometimes you will hit a Tor exit node that is already shunted by upstream searc
 
 Keep your DorXNG SQL database file and rerun your command, or use the --loop switch to iterate the main function repeatedly. 🔁
 
-The more passes you have over a search query the more results you'll find. 🍻
+Most often, the more passes you have over a search query the more results you'll find. 🍻
 
 Four concurrent search requests seems to be the sweet spot. You can issue more, but the more queries you issue at a time the longer it takes to receive results. It also increases the likelihood you receive `HTTP/429 Too Many Requests` responses from upstream search providers on that Tor circuit.
 
