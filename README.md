@@ -68,7 +68,7 @@ Keep in mind that DorXNG will continue to append new search results to the `dorx
 
 Four concurrent search requests seems to be the sweet spot. You can issue more, but the more queries you issue at a time the longer it takes to receive results. It also increases the likelihood you receive `HTTP/429 Too Many Requests` responses from upstream search providers on that specific Tor circuit.
 
-If you start multiple SearXNG Docker containers too rapidly sometimes Tor connections may fail to establish.
+If you start multiple SearXNG Docker containers too rapidly Tor connections may fail to establish.
 While initializing a container, a valid response from the Tor Connectivity Check looks like this:
 ```
 Checking Tor Connectivity..
@@ -81,7 +81,7 @@ There really isn't a reason to run a ton of these containers (yet... 😉). Whil
 The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
 ](https://www.exploit-db.com/google-hacking-database). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
 
-We're gonna need more dorks.. 😅 Check out [DorkGPT](https://www.dorkgpt.com/) 👀
+We're gonna need more dorks... 😅 Check out [DorkGPT](https://www.dorkgpt.com/) 👀
 
 # Instructions
 
