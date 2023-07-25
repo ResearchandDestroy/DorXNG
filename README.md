@@ -7,6 +7,12 @@ Our SearXNG implementation routes all search queries over the [Tor](https://www.
 
 [Buy Us A Beer! 🍺](https://www.buymeacoffee.com/researchanddestroy)
 
+## Shout Outs
+
+Shout out to the developers of `Tor` and `SearXNG` for making this possible. Go donate to both projects!
+
+Shout out to the developer of [pagodo](https://github.com/opsdisk/pagodo) for the inspiration and that sweet [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py) script!
+
 # Setup
 
 #### LINUX ONLY ** Sorry Normies **
@@ -52,9 +58,24 @@ Sometimes you will hit a Tor exit node that is already shunted by upstream searc
 
 Keep your DorXNG SQL database file and rerun your command, or use the --loop switch to iterate the main function repeatedly. 🔁
 
-Most often, the more passes you have over a search query the more results you'll find. 🍻
+Most often, the more passes you make over a search query the more results you'll find. 🍻
 
-Four concurrent search requests seems to be the sweet spot. You can issue more, but the more queries you issue at a time the longer it takes to receive results. It also increases the likelihood you receive `HTTP/429 Too Many Requests` responses from upstream search providers on that Tor circuit.
+Keep in mind that DorXNG will continue to append new search results to the `dorxng.db` database file if you don't use the `--database` switch to specify a different database file. This probably doesn't matter for most, but if you want to keep your `OSINT` investigations seperate it's there for you. 
+
+Four concurrent search requests seems to be the sweet spot. You can issue more, but the more queries you issue at a time the longer it takes to receive results. It also increases the likelihood you receive `HTTP/429 Too Many Requests` responses from upstream search providers on that specific Tor circuit.
+
+If you start multiple SearXNG Docker containers too rapidly sometimes Tor connections will fail to establish.
+While initializing a container, a valid response from the Tor Connectivity Check looks like this:
+```
+Checking Tor Connectivity..
+{"IsTor":true,"IP":"<tor-exit-node>"}
+```
+If you see anything other than that, or if you start to see HTTP/500 response codes coming back from the SearXNG monitor script, kill the Docker container and spin up a new one.
+
+The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
+](https://www.exploit-db.com/google-hacking-database). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
+
+We're gonna need more dorks.. 😅 Check out [DorkGPT](https://www.dorkgpt.com/) 👀
 
 # Instructions
 
