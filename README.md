@@ -54,6 +54,8 @@ Keep your DorXNG SQL database file and rerun your command, or use the --loop swi
 
 The more passes you have over a search query the more results you'll find. 🍻
 
+Four concurrent search requests seems to be the sweet spot. You can issue more, but the more queries you issue at a time the longer it takes to receive results. It also increases the likelihood you receive `HTTP/429 Too Many Requests` responses from upstream search providers on that Tor circuit.
+
 # Instructions
 
 ```
@@ -101,7 +103,7 @@ Page Iteration Mode
 
 Iterative Concurrent Search Queries
 ```
-./DorXNG.py -q 'search query' -c4 -n16
+./DorXNG.py -q 'search query' -c4 -n64
 ```
 
 Server List Iteration Mode
