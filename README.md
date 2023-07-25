@@ -1,9 +1,9 @@
 # DorXNG
-DorXNG is a next generation solution for harvesting `OSINT` data using advanced search engine operators through multiple upstream search providers. On the backend it leverages a heavily modified and containerized image of [SearXNG](https://docs.searxng.org/), a self-host, hackable, privacy focused, meta-search engine.
+DorXNG is a modern solution for harvesting `OSINT` data using advanced search engine operators through multiple upstream search providers. On the backend it leverages a purpose built containerized image of [SearXNG](https://docs.searxng.org/), a self-host, hackable, privacy focused, meta-search engine.
 
 Our SearXNG implementation routes all search queries over the [Tor](https://www.torproject.org/) network while refreshing circuits every ten seconds with the `MaxCircuitDirtiness` configuration directive. This allows for evasion of search engine restrictions commonly encountered while issuing many repeated search queries.
 
-The DorXNG client application is written in Python3, and interacts with the SearXNG API to issue search queries concurrently. It can even issue requests across multiple SearXNG instances. The resulting search results are stored in a SQL database.
+The DorXNG client application is written in Python3, and interacts with the SearXNG API to issue search queries concurrently. It can even issue requests across multiple SearXNG instances. The resulting search results are stored in a `SQLite3` database.
 
 #### Please DO NOT use the DorXNG client application against any public SearXNG instances.
 
