@@ -5,6 +5,8 @@ Our SearXNG implementation routes all search queries over the [Tor](https://www.
 
 The DorXNG client application is written in Python3, and interacts with the SearXNG API to issue search queries concurrently. It can even issue requests across multiple SearXNG instances. The resulting search results are stored in a `SQLite3` database.
 
+![DorXNG](dorxng.gif)
+
 #### Please DO NOT use the DorXNG client application against any public SearXNG instances.
 
 [Buy Us A Beer! 🍺](https://www.buymeacoffee.com/researchanddestroy)
