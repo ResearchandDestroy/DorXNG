@@ -1,7 +1,9 @@
 # DorXNG
-DorXNG is a next generation solution for harvesting OSINT data using advanced search engine operators through multiple upstream search providers. On the backend it leverages a heavily modified and containerized image of [SearXNG](https://docs.searxng.org/), a self-host, hackable, privacy focused, meta-search engine.
+DorXNG is a next generation solution for harvesting `OSINT` data using advanced search engine operators through multiple upstream search providers. On the backend it leverages a heavily modified and containerized image of [SearXNG](https://docs.searxng.org/), a self-host, hackable, privacy focused, meta-search engine.
 
-Our SearXNG implementation routes all search queries over the [Tor](https://www.torproject.org/) network while refreshing circuits every ten seconds to evade search engine restrictions and increase anonymity. The DorXNG client application is written in Python3, and interacts with the SearXNG API to issue search queries concurrently. It can even issue requests across multiple SearXNG instances. The resulting search results are stored in a SQL database.
+Our SearXNG implementation routes all search queries over the [Tor](https://www.torproject.org/) network while refreshing circuits every ten seconds with the `MaxCircuitDirtiness` configuration directive. This allows for evasion of search engine restrictions commonly encountered while issuing many repeated search queries.
+
+The DorXNG client application is written in Python3, and interacts with the SearXNG API to issue search queries concurrently. It can even issue requests across multiple SearXNG instances. The resulting search results are stored in a SQL database.
 
 #### Please DO NOT use the DorXNG client application against any public SearXNG instances.
 
@@ -26,7 +28,7 @@ pip install -r requirements.txt
 ./DorXNG.py -h
 ```
 
-Download and Run Our Custom SearXNG Docker Container (at least one). Multiple SearXNG instances can be used. Use the --serverlist option with DorXNG.
+Download and Run Our Custom SearXNG Docker Container (at least one). Multiple SearXNG instances can be used. Use the `--serverlist` option with DorXNG.
 
 #### When starting multiple containers wait a few seconds between starting each one.
 ```
@@ -54,9 +56,9 @@ Query the DorXNG Database
 
 # Tips
 
-Sometimes you will hit a Tor exit node that is already shunted by upstream search providers. Not to worry... Just keep firing off queries. 😉
+Sometimes you will hit a Tor exit node that is already shunted by upstream search providers, causing you to receive a minimal amount of search results. Not to worry... Just keep firing off queries. 😉
 
-Keep your DorXNG SQL database file and rerun your command, or use the --loop switch to iterate the main function repeatedly. 🔁
+Keep your DorXNG SQL database file and rerun your command, or use the `--loop` switch to iterate the main function repeatedly. 🔁
 
 Most often, the more passes you make over a search query the more results you'll find. 🍻
 
@@ -70,7 +72,9 @@ While initializing a container, a valid response from the Tor Connectivity Check
 Checking Tor Connectivity..
 {"IsTor":true,"IP":"<tor-exit-node>"}
 ```
-If you see anything other than that, or if you start to see HTTP/500 response codes coming back from the SearXNG monitor script, kill the Docker container and spin up a new one.
+If you see anything other than that, or if you start to see `HTTP/500` response codes coming back from the SearXNG monitor script, kill the Docker container and spin up a new one.
+
+There really isn't a reason to run a ton of these containers (yet... 😉). While running multiple we use eight instances. See: [server.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/server.lst)
 
 The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
 ](https://www.exploit-db.com/google-hacking-database). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
