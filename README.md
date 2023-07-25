@@ -29,7 +29,7 @@ docker run researchanddestroy/searxng:latest
 
 If you would like to build the container yourself:
 ```
-git clone https://github.com/researchanddestroy/searxng **The URL must be all lowercase for the build process to complete**
+git clone https://github.com/researchanddestroy/searxng # The URL must be all lowercase for the build process to complete
 cd searxng
 DOCKER_BUILDKIT=1 make docker.build
 docker images
