@@ -26,6 +26,7 @@
 
 # Import Modules
 import signal
+import sys
 import features
 import parse_args
 import url_construction
@@ -36,6 +37,9 @@ import data_handling
 # Main Function
 def main():
 
+    # Increase Maximum Recursion Depth
+    sys.setrecursionlimit(10 ** 10)
+    
     # Print Banner
     features.banner()
 
