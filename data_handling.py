@@ -12,16 +12,16 @@ def database_query(args, database_name, previous_results):
         database_results = []
         results_found = []
 
-        # Create Formated List of Database Results
-        for result in previous_results:
-            results = "{} | {} | {}".format(result[0], result[1], result[2])
-            database_results.append(results)
-
         # Search for Matching Results
-        for result in database_results:
-            if re.search(args.databasequery, result, re.IGNORECASE):
-                results_found.append(result)
-                print(result)
+        # Only Match Title or URL
+        for entry in previous_results:
+            if re.search(args.databasequery, entry[1], re.IGNORECASE) or re.search(args.databasequery, entry[2], re.IGNORECASE):
+                results = "{} | {} | {}".format(entry[0], entry[1], entry[2])
+                results_found.append(results)
+
+                # Print Matching Results
+                for result in results_found:
+                    print(result)
         print('\n' + str(len(results_found)) + ' Results Found')
         exit(0)
 
