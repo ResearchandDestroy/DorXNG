@@ -126,21 +126,24 @@ def issue_search(args, server, server_list, previous_server,
             if args.querylist is not None:
                 print("\nReceived an Invalid Response..")
                 print(error)
-                print("Trying Next Server..\n")
+                print("Retrying Request..\n")
 
-                # Reset Server to First Entry
-                if previous_server == len(server_list) + 1:
-                    previous_server = 0
-                    server = server_list[0]
+                # If Server List Mode is Enabled
+                if args.serverlist is not None:
+                
+                    # Reset Server to First Entry
+                    if previous_server == len(server_list) + 1:
+                        previous_server = 0
+                        server = server_list[0]
 
-                # Increment Previous Server on the First Pass
-                if args.serverlist is not None and previous_server == 0:
-                    previous_server = server_list.index(server) + 1
+                    # Increment Previous Server on the First Pass
+                    if args.serverlist is not None and previous_server == 0:
+                        previous_server = server_list.index(server) + 1
 
-                # Increment Previous Server Up to Last List Entry Then Reset to Zero
-                if previous_server != 0:
-                    server = server_list[previous_server - 1]
-                    previous_server = server_list.index(server) + 2
+                    # Increment Previous Server Up to Last List Entry Then Reset to Zero
+                    if previous_server != 0:
+                        server = server_list[previous_server - 1]
+                        previous_server = server_list.index(server) + 2
 
                 # Issue Iterated Search Query
                 results = issue_search(args, server, server_list, previous_server,
