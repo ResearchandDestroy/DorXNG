@@ -19,9 +19,10 @@ def database_query(args, database_name, previous_results):
                 results = "{} | {} | {}".format(entry[0], entry[1], entry[2])
                 results_found.append(results)
 
-                # Print Matching Results
-                for result in results_found:
-                    print(result)
+        # Print Matching Results
+        for result in results_found:
+            print(result)
+
         print('\n' + str(len(results_found)) + ' Results Found')
         exit(0)
 
