@@ -5,7 +5,7 @@ import search
 import data_handling
 
 # Page Iterator Function
-def page_iterator(args, database_name, database_file, page_iteration_mode,
+def page_iterator(args, database_name, database_file, detect_database, page_iteration_mode,
                   page_iteration_number, page_number, reset_page_number, concurrent_connections,
                   concurrent_params, concurrent_pages, timer, server,
                   previous_server, server_list, query_list, search_params,
@@ -26,7 +26,7 @@ def page_iterator(args, database_name, database_file, page_iteration_mode,
         # If Current Query is Last in Query List Exit
         if args.query == query_list[-1]:
             # Summarize Results
-            print('\nTOTAL NUMBER OF RESULTS: ' + str(len(total_current_results)) + '\n')
+            print('\nTOTAL NUMBER OF RESULTS: ' + str(len(database_results)) + '\n')
             if args.loop is not None:
                 return
             else:
@@ -65,7 +65,7 @@ def page_iterator(args, database_name, database_file, page_iteration_mode,
                 # If Current Query is Last in Query List Exit
                 if args.query == query_list[-1]:
                     # Summarize Results
-                    print('\nTOTAL NUMBER OF RESULTS: ' + str(len(total_current_results)))
+                    print('\nTOTAL NUMBER OF RESULTS: ' + str(len(database_results)))
                     if args.loop is not None:
                         return
                     else:
@@ -81,7 +81,7 @@ def page_iterator(args, database_name, database_file, page_iteration_mode,
                     reset_page_number = True
             else:
                 # Summarize Results
-                print('\nTOTAL NUMBER OF RESULTS: ' + str(len(total_current_results)))
+                print('\nTOTAL NUMBER OF RESULTS: ' + str(len(database_results)))
                 if args.loop is not None:
                     return
                 else:
@@ -129,10 +129,19 @@ def page_iterator(args, database_name, database_file, page_iteration_mode,
 
     # If Results Data is Not Empty
     if results_data != []:
+        
+        # If Previous Database Detected and No Total Current Results
+        if detect_database is True and total_current_results is not None:
+            for result in total_current_results:
+                previous_results.append(result)
 
-        # Set Current Results to Previous and Reset Current
-        previous_results = total_current_results
-        total_current_results = []
+            # Reset Detect Database
+            detect_database = False
+
+        else:
+
+            # Set Current Results to Previous and Reset Current
+            previous_results = total_current_results
 
         # Output Results
         data_handling.output_results(args, concurrent_connections,
@@ -149,6 +158,7 @@ def page_iterator(args, database_name, database_file, page_iteration_mode,
             previous_results = total_current_results
 
         # If No New Results Counter is Zero it is Disabled
+
         if args.nonewresults == 0 or no_new_results_counter == 0:
             print("\nNo Results Detected!")
 
@@ -166,7 +176,7 @@ def page_iterator(args, database_name, database_file, page_iteration_mode,
                 # If Current Query is Last in Query List Exit
                 if args.query == query_list[-1]:
                     # Summarize Results
-                    print('\nTOTAL NUMBER OF RESULTS: ' + str(len(total_current_results)))
+                    print('\nTOTAL NUMBER OF RESULTS: ' + str(len(database_results)))
                     if args.loop is not None:
                         return
                     else:
@@ -182,14 +192,14 @@ def page_iterator(args, database_name, database_file, page_iteration_mode,
                     reset_page_number = True
             else:
                 # Summarize Results
-                print('\nTOTAL NUMBER OF RESULTS: ' + str(len(total_current_results)))
+                print('\nTOTAL NUMBER OF RESULTS: ' + str(len(database_results)))
                 if args.loop is not None:
                     return
                 else:
                     exit(0)
 
     # Continue Iteration
-    page_iterator(args, database_name, database_file, page_iteration_mode,
+    page_iterator(args, database_name, database_file, detect_database, page_iteration_mode,
                   page_iteration_number, page_number, reset_page_number, concurrent_connections,
                   concurrent_params, concurrent_pages, timer, server,
                   previous_server, server_list, query_list, search_params,

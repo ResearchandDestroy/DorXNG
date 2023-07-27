@@ -55,6 +55,7 @@ def main():
     concurrent_params = []
     concurrent_pages = int() 
     database_file = str()
+    detect_database = False
     no_new_results_counter = int()
     results_data = []
     previous_results = []
@@ -76,7 +77,7 @@ def main():
                        query_list, server_list)
 
     # Check for Previous Database
-    previous_results = data_handling.previous_database(args, database_name, previous_results)
+    previous_results, detect_database = data_handling.previous_database(args, database_name, detect_database, previous_results)
 
     # Handle Database Query Requests
     if args.databasequery:
@@ -123,7 +124,7 @@ def main():
 
     # If Page Iteration Mode or Query List Option is Enabled Go to Page Iterator
     if page_iteration_mode is True or args.querylist is not None:
-        iterator.page_iterator(args, database_name, database_file,
+        iterator.page_iterator(args, database_name, database_file, detect_database,
                       page_iteration_mode, page_iteration_number, page_number,
                       reset_page_number, concurrent_connections, concurrent_params,
                       concurrent_pages, timer, server, previous_server, server_list,
@@ -134,7 +135,7 @@ def main():
     if args.loop is not None:
         pass
     else:
-        print('\nTOTAL NUMBER OF RESULTS: ' + str(len(total_current_results)))
+        print('\nTOTAL NUMBER OF RESULTS: ' + str(len(database_results)))
 
 
 # Define and Gather Arguments Before Main

@@ -31,7 +31,7 @@ def database_query(args, database_name, previous_results):
         exit(1)
 
 # Previous Database Function
-def previous_database(args, database_name, previous_results):
+def previous_database(args, database_name, detect_database, previous_results):
 
     # Check if Database File Exists
     if os.path.exists('./' + database_name):
@@ -53,7 +53,10 @@ def previous_database(args, database_name, previous_results):
         # Close Database Connection
         connection.close()
         
-    return previous_results
+        # If Previous Database Detected Set to True
+        detect_database = True
+
+    return previous_results, detect_database
 
 
 # Prepare Data Function
