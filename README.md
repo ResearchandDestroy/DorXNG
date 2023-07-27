@@ -9,7 +9,7 @@ The DorXNG client application is written in Python3, and interacts with the Sear
 
 #### Please DO NOT use the DorXNG client application against any public SearXNG instances.
 
-[Buy Us A Beer! 🍺](https://www.buymeacoffee.com/researchanddestroy)
+# [Buy Us A Beer! 🍺](https://www.buymeacoffee.com/researchanddestroy)
 
 ## Shout Outs
 
