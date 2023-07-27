@@ -39,7 +39,7 @@ def main():
 
     # Increase Maximum Recursion Depth
     sys.setrecursionlimit(10 ** 9)
-    
+
     # Print Banner
     features.banner()
 
@@ -105,8 +105,8 @@ def main():
                 concurrent_pages, search_params, search_query)
 
     # Issue Search Query
-    results = search.issue_search(args, server, server_list, previous_server, search_params,
-                                  search_query, concurrent_connections, concurrent_params)
+    results = search.issue_search(args, server, server_list, previous_server, page_iteration_mode,
+                                  search_params, search_query, concurrent_connections, concurrent_params)
 
     # Prepare Data
     results_data, list_of_raw_results, previous_server  = data_handling.prepare_data(

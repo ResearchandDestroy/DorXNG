@@ -117,7 +117,7 @@ def page_iterator(args, database_name, database_file, page_iteration_mode,
         time.sleep(4)
 
     # Issue Iterated Search Query
-    results = search.issue_search(args, server, server_list, previous_server,
+    results = search.issue_search(args, server, server_list, previous_server, page_iteration_mode,
                                   search_params, search_query, concurrent_connections, concurrent_params)
 
     # Prepare Results

@@ -3,7 +3,7 @@ import requests
 
 # Search Query Function
 def issue_search(args, server, server_list, previous_server,
-                 search_params, search_query,
+                 page_iteration_mode, search_params, search_query,
                  concurrent_connections, concurrent_params):
 
     # Disable Certificate Validation Warning
@@ -57,7 +57,7 @@ def issue_search(args, server, server_list, previous_server,
                 print("Trying Next Server..\n")
 
                 # Issue Iterated Search Query
-                results = issue_search(args, server, server_list, previous_server,
+                results = issue_search(args, server, server_list, previous_server, page_iteration_mode,
                              search_params, search_query, concurrent_connections, concurrent_params)
 
                 return results
@@ -79,14 +79,14 @@ def issue_search(args, server, server_list, previous_server,
 
             # HTTP Error Handling for Concurrent Requests
             except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as error:
-                if args.querylist is not None:
+                if args.querylist is not None or page_iteration_mode is True:
                     print("\nReceived an Invalid Response..")
                     print(error)
                     print("Trying Next Server..\n")
 
                     # If Server List Mode is Enabled
                     if args.serverlist is not None:
-                  
+
                         # Reset Server to First Entry
                         if previous_server == len(server_list) + 1:
                             previous_server = 0
@@ -102,7 +102,7 @@ def issue_search(args, server, server_list, previous_server,
                             previous_server = server_list.index(server) + 2
 
                     # Issue Iterated Search Query
-                    results = issue_search(args, server, server_list, previous_server,
+                    results = issue_search(args, server, server_list, previous_server, page_iteration_mode,
                                  search_params, search_query, concurrent_connections, concurrent_params)
 
                     return results, previous_server
@@ -126,14 +126,14 @@ def issue_search(args, server, server_list, previous_server,
 
         # HTTP Error Handling for Single Requests
         except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as error:
-            if args.querylist is not None:
+            if args.querylist is not None or page_iteration_mode is True:
                 print("\nReceived an Invalid Response..")
                 print(error)
-                print("Retrying Request..\n")
+                print("Trying Next Server..\n")
 
                 # If Server List Mode is Enabled
                 if args.serverlist is not None:
-                
+
                     # Reset Server to First Entry
                     if previous_server == len(server_list) + 1:
                         previous_server = 0
@@ -149,7 +149,7 @@ def issue_search(args, server, server_list, previous_server,
                         previous_server = server_list.index(server) + 2
 
                 # Issue Iterated Search Query
-                results = issue_search(args, server, server_list, previous_server,
+                results = issue_search(args, server, server_list, previous_server, page_iteration_mode,
                              search_params, search_query, concurrent_connections, concurrent_params)
 
                 return results, previous_server
