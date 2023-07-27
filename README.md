@@ -1,11 +1,21 @@
 # DorXNG
 DorXNG is a modern solution for harvesting `OSINT` data using advanced search engine operators through multiple upstream search providers. On the backend it leverages a purpose built containerized image of [SearXNG](https://docs.searxng.org/), a self-host, hackable, privacy focused, meta-search engine.
 
-Our SearXNG implementation routes all search queries over the [Tor](https://www.torproject.org/) network while refreshing circuits every ten seconds with the `MaxCircuitDirtiness` configuration directive. This allows for evasion of search engine restrictions commonly encountered while issuing many repeated search queries.
+Our SearXNG implementation routes all search queries over the [Tor](https://www.torproject.org/) network while refreshing circuits every ten seconds with Tor's `MaxCircuitDirtiness` configuration directive. We have also disabled all of SearXNG's client side timeout features. These settings allows for evasion of search engine restrictions commonly encountered while issuing many repeated search queries.
 
 The DorXNG client application is written in Python3, and interacts with the SearXNG API to issue search queries concurrently. It can even issue requests across multiple SearXNG instances. The resulting search results are stored in a `SQLite3` database.
 
 ![DorXNG](dorxng.gif)
+
+We have also enabled every upstream search engine that supports advanced search operator queries:
+
+- Google
+- DuckDuckGo
+- Qwant
+- Bing
+- Brave
+- Startpage
+- Yahoo
 
 #### Please DO NOT use the DorXNG client application against any public SearXNG instances.
 
@@ -45,7 +55,7 @@ DOCKER_BUILDKIT=1 make docker.build
 docker images
 docker run <image-id>
 ```
-By default DorXNG has a hard-coded `server` variable in [parse_args.py](https://github.com/ResearchandDestroy/DorXNG/blob/main/parse_args.py) which is set to the IP address that Docker will assign to the first container you run on your machine `172.17.0.2`. This can be changes, or overwritten with `--server` or `--serverlist`.
+By default DorXNG has a hard coded `server` variable in [parse_args.py](https://github.com/ResearchandDestroy/DorXNG/blob/main/parse_args.py) which is set to the IP address that Docker will assign to the first container you run on your machine `172.17.0.2`. This can be changes, or overwritten with `--server` or `--serverlist`.
 
 Start Issuing Search Queries
 ```
