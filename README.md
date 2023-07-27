@@ -23,7 +23,7 @@ For more information about what search engines SearXNG supports See: [Configured
 
 # [Buy Us A Beer! 🍺](https://www.buymeacoffee.com/researchanddestroy)
 
-## Shout Outs 🙌
+# Shout Outs 🙌
 
 Shout out to the developers of `Tor` and `SearXNG` for making this possible. Go donate to both projects!
 
