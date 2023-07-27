@@ -23,13 +23,13 @@ For more information about what search engines SearXNG supports See: [Configured
 
 # [Buy Us A Beer! 🍺](https://www.buymeacoffee.com/researchanddestroy)
 
-## Shout Outs
+## Shout Outs 🙌
 
 Shout out to the developers of `Tor` and `SearXNG` for making this possible. Go donate to both projects!
 
 Shout out to the developer of [pagodo](https://github.com/opsdisk/pagodo) for the inspiration and that sweet [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py) script!
 
-# Setup
+# Setup 🛠️
 
 #### LINUX ONLY ** Sorry Normies **
 
@@ -69,7 +69,7 @@ Query the DorXNG Database
 ./DorXNG.py -D 'regex search string'
 ```
 
-# Tips
+# Tips 📝
 
 Sometimes you will hit a Tor exit node that is already shunted by upstream search providers, causing you to receive a minimal amount of search results. Not to worry... Just keep firing off queries. 😉
 
@@ -104,7 +104,7 @@ The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/
 
 We're gonna need more dorks... 😅 Check out [DorkGPT](https://www.dorkgpt.com/) 👀
 
-# Instructions
+# Instructions 📖
 
 ```
   -s SERVER, --server SERVER
@@ -132,7 +132,7 @@ We're gonna need more dorks... 😅 Check out [DorkGPT](https://www.dorkgpt.com/
   -vv, --veryverbose    Enable Very Verbose Output - Displays Raw JSON Output
 ```
 
-# Examples
+# Examples 💡
 
 Single Search Query
 ```
