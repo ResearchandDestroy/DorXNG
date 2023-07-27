@@ -45,6 +45,7 @@ DOCKER_BUILDKIT=1 make docker.build
 docker images
 docker run <image-id>
 ```
+By default DorXNG has a hard-coded `server` variable in [parse_args.py](https://github.com/ResearchandDestroy/DorXNG/blob/main/parse_args.py) which is set to the IP address that Docker will assign to the first container you run on your machine `172.17.0.2`. This can be changes, or overwritten with `--server` or `--serverlist`.
 
 Start Issuing Search Queries
 ```
@@ -74,9 +75,17 @@ While initializing a container, a valid response from the Tor Connectivity Check
 Checking Tor Connectivity..
 {"IsTor":true,"IP":"<tor-exit-node>"}
 ```
-If you see anything other than that, or if you start to see `HTTP/500` response codes coming back from the SearXNG monitor script, kill the Docker container and spin up a new one.
+If you see anything other than that, or if you start to see `HTTP/500` response codes coming back from the SearXNG monitor script (STDOUT in the container), kill the Docker container and spin up a new one.
 
-There really isn't a reason to run a ton of these containers (yet... 😉). While running multiple we use eight instances. See: [server.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/server.lst)
+There really isn't a reason to run a ton of these containers... Yet... 😉 How many you run really depends on what you're doing. Each container uses approximately `1.25GBs` of RAM.
+
+Running one container works perfectly fine. Running multiple is nice because each has its own Tor curcuit thats refreshing every 10 seconds.
+
+When running `--serverlist` mode disable the `--timeout` feature so there is no delay between requests (default delay is 4 seconds).
+
+Just keep in mind that the more containers you run the more memory you will need. This goes for deep recursion too...
+
+The more recursions your command goes through the more memory the process will consume. You may come back to find your command has crashed with a `Killed` error message. If this happens your machine ran out of memory and killed the process. Not to worry though... Your database file is still good. 👍👍
 
 The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
 ](https://www.exploit-db.com/google-hacking-database). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
