@@ -7,7 +7,7 @@ The DorXNG client application is written in Python3, and interacts with the Sear
 
 ![DorXNG](dorxng.gif)
 
-We have also enabled every upstream search engine that supports advanced search operator queries:
+We have enabled every upstream search engine that supports advanced search operator queries:
 
 - Google
 - DuckDuckGo
@@ -16,6 +16,8 @@ We have also enabled every upstream search engine that supports advanced search 
 - Brave
 - Startpage
 - Yahoo
+
+For more information about what search engines SearXNG supports See: [Configured Engines](https://docs.searxng.org/user/configured_engines.html)
 
 #### Please DO NOT use the DorXNG client application against any public SearXNG instances.
 
