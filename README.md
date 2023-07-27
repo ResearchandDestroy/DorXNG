@@ -89,6 +89,8 @@ Checking Tor Connectivity..
 ```
 If you see anything other than that, or if you start to see `HTTP/500` response codes coming back from the SearXNG monitor script (STDOUT in the container), kill the Docker container and spin up a new one.
 
+`HTTP/504 Gateway Time-out` response codes within DorXNG are expected sometimes. This means the SearXNG instance did not receive a valid response back within one minute. That specific Tor curcuit is probably too slow. Just keep going!
+
 There really isn't a reason to run a ton of these containers... Yet... 😉 How many you run really depends on what you're doing. Each container uses approximately `1.25GBs` of RAM.
 
 Running one container works perfectly fine. Running multiple is nice because each has its own Tor curcuit thats refreshing every 10 seconds.
