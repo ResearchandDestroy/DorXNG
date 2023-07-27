@@ -31,7 +31,7 @@ Shout out to the developer of [pagodo](https://github.com/opsdisk/pagodo) for th
 
 # Setup 🛠️
 
-#### LINUX ONLY ** Sorry Normies **
+### LINUX ONLY ** Sorry Normies ** 🤓
 
 Install DorXNG
 
