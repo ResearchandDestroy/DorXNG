@@ -69,43 +69,6 @@ Query the DorXNG Database
 ./DorXNG.py -D 'regex search string'
 ```
 
-# Tips 📝
-
-Sometimes you will hit a Tor exit node that is already shunted by upstream search providers, causing you to receive a minimal amount of search results. Not to worry... Just keep firing off queries. 😉
-
-Keep your DorXNG SQL database file and rerun your command, or use the `--loop` switch to iterate the main function repeatedly. 🔁
-
-Most often, the more passes you make over a search query the more results you'll find. 🍻
-
-Keep in mind that DorXNG will continue to append new search results to the `dorxng.db` database file if you don't use the `--database` switch to specify a different database file. This probably doesn't matter for most, but if you want to keep your `OSINT` investigations seperate it's there for you. 
-
-Four concurrent search requests seems to be the sweet spot. You can issue more, but the more queries you issue at a time the longer it takes to receive results. It also increases the likelihood you receive `HTTP/429 Too Many Requests` responses from upstream search providers on that specific Tor circuit.
-
-If you start multiple SearXNG Docker containers too rapidly Tor connections may fail to establish.
-While initializing a container, a valid response from the Tor Connectivity Check looks like this:
-```
-Checking Tor Connectivity..
-{"IsTor":true,"IP":"<tor-exit-node>"}
-```
-If you see anything other than that, or if you start to see `HTTP/500` response codes coming back from the SearXNG monitor script (STDOUT in the container), kill the Docker container and spin up a new one.
-
-`HTTP/504 Gateway Time-out` response codes within DorXNG are expected sometimes. This means the SearXNG instance did not receive a valid response back within one minute. That specific Tor curcuit is probably too slow. Just keep going!
-
-There really isn't a reason to run a ton of these containers... Yet... 😉 How many you run really depends on what you're doing. Each container uses approximately `1.25GBs` of RAM.
-
-Running one container works perfectly fine. Running multiple is nice because each has its own Tor curcuit thats refreshing every 10 seconds.
-
-When running `--serverlist` mode disable the `--timeout` feature so there is no delay between requests (default delay is 4 seconds).
-
-Just keep in mind that the more containers you run the more memory you will need. This goes for deep recursion too...
-
-The more recursions your command goes through the more memory the process will consume. You may come back to find your command has crashed with a `Killed` error message. If this happens your machine ran out of memory and killed the process. Not to worry though... Your database file is still good. 👍👍
-
-The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
-](https://www.exploit-db.com/google-hacking-database). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
-
-We're gonna need more dorks... 😅 Check out [DorkGPT](https://www.dorkgpt.com/) 👀
-
 # Instructions 📖
 
 ```
@@ -133,6 +96,51 @@ We're gonna need more dorks... 😅 Check out [DorkGPT](https://www.dorkgpt.com/
   -v, --verbose         Enable Verbose Output
   -vv, --veryverbose    Enable Very Verbose Output - Displays Raw JSON Output
 ```
+
+# Tips 📝
+
+Sometimes you will hit a Tor exit node that is already shunted by upstream search providers, causing you to receive a minimal amount of search results. Not to worry... Just keep firing off queries. 😉
+
+Keep your DorXNG SQL database file and rerun your command, or use the `--loop` switch to iterate the main function repeatedly. 🔁
+
+Most often, the more passes you make over a search query the more results you'll find. 🍻
+
+Also keep in mind that we have made a sacrifice in speed for a higher degree of data output. This is an `OSINT` project after all. 🔎🌎
+
+Each search query you make is being issued to `7` upstream search providers... So especially with `--concurrent` queries this generates a lot of requests... So have patience.
+
+Keep in mind that DorXNG will continue to append new search results to the `dorxng.db` database file if you don't use the `--database` switch to specify a different one. This probably doesn't matter for most, but if you want to keep your `OSINT` investigations seperate it's there for you. 
+
+Four concurrent search requests seems to be the sweet spot. You can issue more, but the more queries you issue at a time the longer it takes to receive results. It also increases the likelihood you receive `HTTP/429 Too Many Requests` responses from upstream search providers on that specific Tor circuit.
+
+If you start multiple SearXNG Docker containers too rapidly Tor connections may fail to establish.
+While initializing a container, a valid response from the Tor Connectivity Check function looks like this:
+```
+Checking Tor Connectivity..
+{"IsTor":true,"IP":"<tor-exit-node>"}
+```
+If you see anything other than that, or if you start to see `HTTP/500` response codes coming back from the SearXNG monitor script (STDOUT in the container), kill the Docker container and spin up a new one.
+
+`HTTP/504 Gateway Time-out` response codes within DorXNG are expected sometimes. This means the SearXNG instance did not receive a valid response back within one minute. That specific Tor curcuit is probably too slow. Just keep going!
+
+There really isn't a reason to run a ton of these containers... Yet... 😉 How many you run really depends on what you're doing. Each container uses approximately `1.25GBs` of RAM.
+
+Running one container works perfectly fine. Running multiple is nice because each has its own Tor curcuit thats refreshing every 10 seconds.
+
+When running `--serverlist` mode disable the `--timeout` feature so there is no delay between requests (The default delay interval is 4 seconds).
+
+Just keep in mind that the more containers you run the more memory you will need. This goes for deep recursion too...
+
+The more recursions your command goes through the more memory the process will consume. You may come back to find that the process has crashed with a `Killed` error message. If this happens your machine ran out of memory and killed the process. Not to worry though... Your database file is still good. 👍👍
+
+If your database file gets exceptionally large it inevitably slows down the program and consumes more memory with each iteration... We've seen a marked drop in performance with database files that exceed approximately 50 thousand entries.
+
+The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
+](https://www.exploit-db.com/google-hacking-database). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
+
+However, when using `--querylist` iteration mode its best to use lists that are shorter than the included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst)... With one instance on a machine with `16GBs` of memory we were able to iterate over several thousand queries before the process crashed.
+
+We're gonna need more dorks... 😅 Check out [DorkGPT](https://www.dorkgpt.com/) 👀
 
 # Examples 💡
 
