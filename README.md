@@ -140,7 +140,7 @@ We've seen a marked drop in performance with database files that exceed approxim
 The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
 ](https://www.exploit-db.com/google-hacking-database). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
 
-However, when using `--querylist` iteration mode its best to use lists that are shorter than the included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst)... With one instance on a machine with `16GBs` of memory we were able to iterate over several thousand queries using `./DorXNG.py -S server.lst -Q query.lst -c4 -n64 -t0` before the process crashed.
+However, when using `--querylist` iteration mode its best to use lists that are shorter than the included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst)... With one instance on a machine with `16GBs` of memory we were able to iterate over approximately six thousand queries using `./DorXNG.py -S server.lst -Q query.lst -c4 -n64 -t0` before the process crashed.
 
 A rewrite of `DorXNG` in `Golang` is already in the works. 😉 (`GorXNG`? | `DorXNGNG`?) 😆
 
