@@ -137,7 +137,7 @@ If your database file gets exceptionally large it inevitably slows down the prog
 
 Those Python Stack Frames are Thicc. 🍑😅
 
-We've seen a marked drop in performance with database files that exceed approximately 80 thousand entries.
+We've seen a marked drop in performance with database files that exceed approximately 50 thousand entries.
 
 The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
 ](https://www.exploit-db.com/google-hacking-database). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
