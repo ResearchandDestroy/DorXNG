@@ -57,7 +57,7 @@ DOCKER_BUILDKIT=1 make docker.build
 docker images
 docker run <image-id>
 ```
-By default DorXNG has a hard coded `server` variable in [parse_args.py](https://github.com/ResearchandDestroy/DorXNG/blob/main/parse_args.py) which is set to the IP address that Docker will assign to the first container you run on your machine `172.17.0.2`. This can be changes, or overwritten with `--server` or `--serverlist`.
+By default DorXNG has a hard coded `server` variable in [parse_args.py](https://github.com/ResearchandDestroy/DorXNG/blob/main/parse_args.py) which is set to the IP address that Docker will assign to the first container you run on your machine `172.17.0.2`. This can be changed, or overwritten with `--server` or `--serverlist`.
 
 Start Issuing Search Queries
 ```
@@ -133,7 +133,9 @@ Keep in mind that the more containers you run the more memory you will need. Thi
 
 The more recursions your command goes through the more memory the process will consume. You may come back to find that the process has crashed with a `Killed` error message. If this happens your machine ran out of memory and killed the process. Not to worry though... Your database file is still good. 👍👍
 
-If your database file gets exceptionally large it inevitably slows down the program and consumes more memory with each iteration... Those Python Stack Frames are Thicc. 😅
+If your database file gets exceptionally large it inevitably slows down the program and consumes more memory with each iteration...
+
+Those Python Stack Frames are Thicc. 🍑😅
 
 We've seen a marked drop in performance with database files that exceed approximately 80 thousand entries.
 
