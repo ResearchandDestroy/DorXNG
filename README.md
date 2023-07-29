@@ -44,7 +44,7 @@ pip install -r requirements.txt
 ./DorXNG.py -h
 ```
 
-Download and Run Our Custom SearXNG Docker Container (at least one). Multiple SearXNG instances can be used. Use the `--serverlist` option with DorXNG.
+Download and Run Our Custom SearXNG Docker Container (at least one). Multiple SearXNG instances can be used. Use the `--serverlist` option with DorXNG. See: [server.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/server.lst)
 
 #### When starting multiple containers wait a few seconds between starting each one.
 ```
