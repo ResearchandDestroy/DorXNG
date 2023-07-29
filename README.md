@@ -29,6 +29,8 @@ Shout out to the developers of `Tor` and `SearXNG` for making this possible. Go 
 
 Shout out to the developer of [pagodo](https://github.com/opsdisk/pagodo) for the inspiration and that sweet [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py) script!
 
+Last but certainly not least, shout out to [j0hnny](https://en.wikipedia.org/wiki/Johnny_Long). The OG Dork. 🧠🏴‍☠
+
 # Setup 🛠️
 
 ### LINUX ONLY ** Sorry Normies ** 🤓
