@@ -71,6 +71,11 @@ def parse_args():
                         help='Issue Database Query - '
                         'Format: Regex')
 
+    parser.add_argument('-m',
+                        '--mergedatabase',
+                        type=str,
+                        help='Merge SQL Database File')
+
     parser.add_argument('-r',
                         '--nonewresults',
                         type=int,

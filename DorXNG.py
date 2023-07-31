@@ -56,6 +56,7 @@ def main():
     concurrent_pages = int() 
     database_file = str()
     detect_database = False
+    database_results = [] 
     no_new_results_counter = int()
     results_data = []
     previous_results = []
@@ -77,7 +78,9 @@ def main():
                        query_list, server_list)
 
     # Check for Previous Database
-    previous_results, detect_database = data_handling.previous_database(args, database_name, detect_database, previous_results)
+    previous_results, detect_database = data_handling.previous_database(args, database_name, database_file,
+                                                                        detect_database, database_results,
+                                                                        previous_results)
 
     # Handle Database Query Requests
     if args.databasequery:

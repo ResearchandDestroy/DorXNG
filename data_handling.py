@@ -31,32 +31,109 @@ def database_query(args, database_name, previous_results):
         exit(1)
 
 # Previous Database Function
-def previous_database(args, database_name, detect_database, previous_results):
+def previous_database(args, database_name, database_file, detect_database, database_results, previous_results):
 
     # Check if Database File Exists
     if os.path.exists('./' + database_name):
 
-        # Create Database Connection and Cursor
-        connection = sqlite3.connect(database_name)
-        cursor = connection.cursor()
+        # If Merge Database
+        if args.mergedatabase:
 
-        if args.databasequery:
-            # Print Data from Database
-            previous_results = cursor.execute(
-                    'SELECT query, title, url FROM search_results').fetchall()
+            # Check if Database File Exists
+            if os.path.exists('./' + args.mergedatabase):
+
+                # Create Database Connection and Cursor
+                connection = sqlite3.connect(args.mergedatabase)
+                cursor = connection.cursor()
+
+            else:
+
+                print('No Database ' + str(args.mergedatabase) + ' Detected..')
+                exit(1)
+
         else:
 
-            # Print Data from Database
+            # Create Database Connection and Cursor
+            connection = sqlite3.connect(database_name)
+            cursor = connection.cursor()
+
+        # If Database Merge or Database Query Mode
+        if args.databasequery or args.mergedatabase:
+
+            # Query Data from Database
+            previous_results = cursor.execute(
+                    'SELECT query, title, url FROM search_results').fetchall()
+
+            # Close Database Connection
+            connection.close()
+
+            # If Merge Database Pass
+            if args.mergedatabase:
+
+                pass
+
+            else:
+
+                return previous_results, detect_database
+
+        else:
+
+            # Query Data from Database
             previous_results = cursor.execute(
                     'SELECT title, url FROM search_results').fetchall()
 
-        # Close Database Connection
-        connection.close()
+            # Close Database Connection
+            connection.close()
         
-        # If Previous Database Detected Set to True
-        detect_database = True
+            # If Previous Database Detected Set to True
+            detect_database = True
+        
+            return previous_results, detect_database
 
-    return previous_results, detect_database
+        # If Merge Database Send Previous Results to Database
+        if args.mergedatabase:
+            
+            # Store Search Results in SQL
+            database_results = store_results(
+                    args, database_name, database_file, previous_results)
+
+            print("Database Merged")
+            print('TOTAL NUMBER OF RESULTS: ' + str(len(database_results)))
+            exit(0)
+
+    else:
+
+        # If Merge Database Send Previous Results to Database
+        if args.mergedatabase:
+
+            # Check if Database File Exists
+            if os.path.exists('./' + args.mergedatabase):
+
+                # Create Database Connection and Cursor
+                connection = sqlite3.connect(args.mergedatabase)
+                cursor = connection.cursor()
+
+            else:
+
+                print('No Database ' + str(args.mergedatabase) + ' Detected..')
+                exit(1)
+
+            # Query Data from Database
+            previous_results = cursor.execute(
+                    'SELECT query, title, url FROM search_results').fetchall()
+
+            # Close Database Connection
+            connection.close()
+
+            # Store Search Results in SQL
+            database_results = store_results(
+                    args, database_name, database_file, previous_results)
+
+            print("Database Merged")
+            print('TOTAL NUMBER OF RESULTS: ' + str(len(database_results)))
+            exit(0)
+
+        return previous_results, detect_database
 
 
 # Prepare Data Function
@@ -136,11 +213,20 @@ def store_results(args, database_name, database_file, results_data):
         cursor.execute(
                 "CREATE TABLE search_results (query TEXT, title TEXT, url TEXT)")
 
-    # Insert Data into Database
-    for entry in results_data:
-        cursor.execute(
-                "INSERT INTO search_results VALUES (?, ?, ?);",
-                (args.query, entry['title'], entry['url']))
+    # If Merge Database
+    if args.mergedatabase:
+        # Insert Data into Database
+        for entry in results_data:
+            cursor.execute(
+                    "INSERT INTO search_results VALUES (?, ?, ?);",
+                    (entry[0], entry[1], entry[2]))
+
+    else:
+        # Insert Data into Database
+        for entry in results_data:
+            cursor.execute(
+                    "INSERT INTO search_results VALUES (?, ?, ?);",
+                    (args.query, entry['title'], entry['url']))
 
     # Deduplicate SQL Entries
     cursor.execute("CREATE TABLE temp_table as SELECT DISTINCT * FROM search_results;")
@@ -151,7 +237,7 @@ def store_results(args, database_name, database_file, results_data):
     # Commit Database Entries
     connection.commit()
 
-    # Print Data from Database
+    # Query Data from Database
     database_results = cursor.execute(
             'SELECT title, url FROM search_results').fetchall()
 
