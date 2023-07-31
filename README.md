@@ -93,6 +93,8 @@ Query the DorXNG Database
                         Specify SQL Database File - Default: 'dorxng.db'
   -D DATABASEQUERY, --databasequery DATABASEQUERY
                         Issue Database Query - Format: Regex
+  -m MERGEDATABASE, --mergedatabase MERGEDATABASE
+                        Merge SQL Database File
   -r NONEWRESULTS, --nonewresults NONEWRESULTS
                         Specify Number of Iterations with No New Results - Default: 4 (3 Attempts) - Disable with 0
   -v, --verbose         Enable Verbose Output
