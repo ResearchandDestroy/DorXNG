@@ -260,9 +260,7 @@ def output_results(args, concurrent_connections,
     # Create Formated List of Current Results
     for result in database_results:
         current_result = "{} | {}".format(result[0], result[1])
-        if result not in previous_results:
-            current_results.append(current_result)
-            total_current_results.append(current_result)
+        current_results.append(current_result)
     
     # Pretty Print Raw JSON Reponses in Very Verbose Mode for Single Page Mode
     if not concurrent_connections and args.veryverbose is True:
@@ -275,9 +273,10 @@ def output_results(args, concurrent_connections,
         pprint.pprint(list_of_raw_results)
 
     # Print New Results
-    elif args.veryverbose is False or previous_results != total_current_results or previous_results == []:
+    elif args.veryverbose is False or previous_results == []:
         for result in current_results:
-            if result not in previous_results:
+            if result not in total_current_results:
                 print(result)
+                total_current_results.append(result)
 
     return previous_results, total_current_results

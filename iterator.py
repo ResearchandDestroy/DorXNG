@@ -138,11 +138,6 @@ def page_iterator(args, database_name, database_file, detect_database, page_iter
             # Reset Detect Database
             detect_database = False
 
-        else:
-
-            # Set Current Results to Previous and Reset Current
-            previous_results = total_current_results
-
         # Output Results
         data_handling.output_results(args, concurrent_connections,
                        results, list_of_raw_results, database_results,
