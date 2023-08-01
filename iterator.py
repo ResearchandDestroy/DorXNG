@@ -130,22 +130,17 @@ def page_iterator(args, database_name, database_file, detect_database, page_iter
     # If Results Data is Not Empty
     if results_data != []:
         
-        # If Previous Database Detected and No Total Current Results
-        if detect_database is True and total_current_results is not None:
-            for result in total_current_results:
-                previous_results.append(result)
-
-            # Reset Detect Database
-            detect_database = False
+        # Set Current Results to Previous and Reset Current
+        previous_results = total_current_results 
 
         # Output Results
         data_handling.output_results(args, concurrent_connections,
-                       results, list_of_raw_results, database_results,
-                       previous_results, total_current_results)
+                   results, list_of_raw_results, database_results,
+                   previous_results, total_current_results)
 
     else:
 
-        # If No Current Results, Total Current Results, or Previous Results is Empty Pass
+        # If Results Data is Empty Pass
         if results_data == []:
             pass
         else:

@@ -86,6 +86,19 @@ def main():
     if args.databasequery:
         data_handling.database_query(args, database_name, previous_results)
 
+    # If Previous Database Detected
+    if detect_database is True:
+        # Create Formated List of Current Results
+        for result in previous_results:
+            current_result = "{} | {}".format(result[0], result[1])
+            total_current_results.append(current_result)
+
+        # Reset Previous Results
+        previous_results = []
+
+        # Reset Detect Database
+        detect_database = False
+
     # If Query List Iteration Mode Print First Query
     if args.querylist is not None:
         print('Query: "' + str(args.query) + '"\n')

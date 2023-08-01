@@ -74,6 +74,9 @@ def previous_database(args, database_name, database_file, detect_database, datab
 
             else:
 
+                # If Previous Database Detected Set to True
+                detect_database = True
+
                 return previous_results, detect_database
 
         else:
@@ -261,7 +264,7 @@ def output_results(args, concurrent_connections,
     for result in database_results:
         current_result = "{} | {}".format(result[0], result[1])
         current_results.append(current_result)
-    
+
     # Pretty Print Raw JSON Reponses in Very Verbose Mode for Single Page Mode
     if not concurrent_connections and args.veryverbose is True:
 
@@ -273,7 +276,8 @@ def output_results(args, concurrent_connections,
         pprint.pprint(list_of_raw_results)
 
     # Print New Results
-    elif args.veryverbose is False or previous_results == []:
+    elif args.veryverbose is False or previous_results != total_current_results or previous_results == []:
+
         for result in current_results:
             if result not in total_current_results:
                 print(result)
