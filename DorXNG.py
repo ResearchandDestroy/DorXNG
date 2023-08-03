@@ -195,7 +195,7 @@ if args.loop == 0 or args.loop is not None:
         for loop in range(args.loop):
 
             # Reset Page Number Per Iteration
-            args.number = page_iteration_number
+            args.number = initial_page_iteration_number
 
             # Execute Main Function N Number of Times
             if __name__ == '__main__':
