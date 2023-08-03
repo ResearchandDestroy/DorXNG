@@ -5,7 +5,7 @@ Our SearXNG implementation routes all search queries over the [Tor](https://www.
 
 The DorXNG client application is written in Python3, and interacts with the SearXNG API to issue search queries concurrently. It can even issue requests across multiple SearXNG instances. The resulting search results are stored in a `SQLite3` database.
 
-![DorXNG](dorxng.gif)
+![DorXNG](demo.gif)
 
 We have enabled every supported upstream search engine that allows advanced search operator queries:
 
@@ -74,31 +74,35 @@ Query the DorXNG Database
 # Instructions 📖
 
 ```
-  -s SERVER, --server SERVER
-                        DorXNG Server Instance - Example: 'https://172.17.0.2/search'
-  -S SERVERLIST, --serverlist SERVERLIST
-                        Issue Search Queries Across a List of Servers - Format: Newline Delimited
-  -q QUERY, --query QUERY
-                        Issue a Search Query - Examples: 'search query' | '!tch search query' | 'site:example.com intext:example'
-  -Q QUERYLIST, --querylist QUERYLIST
-                        Iterate Through a Search Query List - Format: Newline Delimited
-  -n NUMBER, --number NUMBER
-                        Define the Number of Page Result Iterations
-  -c CONCURRENT, --concurrent CONCURRENT
-                        Define the Number of Concurrent Page Requests
-  -L LOOP, --loop LOOP  Define the Number of Main Function Loop Iterations
-  -t TIMEOUT, --timeout TIMEOUT
-                        Specify Timeout Interval Between Requests - Default: 4 Seconds - Disable with 0
-  -d DATABASE, --database DATABASE
-                        Specify SQL Database File - Default: 'dorxng.db'
-  -D DATABASEQUERY, --databasequery DATABASEQUERY
-                        Issue Database Query - Format: Regex
-  -m MERGEDATABASE, --mergedatabase MERGEDATABASE
-                        Merge SQL Database File
-  -r NONEWRESULTS, --nonewresults NONEWRESULTS
-                        Specify Number of Iterations with No New Results - Default: 4 (3 Attempts) - Disable with 0
-  -v, --verbose         Enable Verbose Output
-  -vv, --veryverbose    Enable Very Verbose Output - Displays Raw JSON Output
+-h, --help            show this help message and exit
+-s SERVER, --server SERVER
+                      DorXNG Server Instance - Example: 'https://172.17.0.2/search'
+-S SERVERLIST, --serverlist SERVERLIST
+                      Issue Search Queries Across a List of Servers - Format: Newline Delimited
+-q QUERY, --query QUERY
+                      Issue a Search Query - Examples: 'search query' | '!tch search query' | 'site:example.com intext:example'
+-Q QUERYLIST, --querylist QUERYLIST
+                      Iterate Through a Search Query List - Format: Newline Delimited
+-n NUMBER, --number NUMBER
+                      Define the Number of Page Result Iterations
+-c CONCURRENT, --concurrent CONCURRENT
+                      Define the Number of Concurrent Page Requests
+-l LIMITDATABASE, --limitdatabase LIMITDATABASE
+                      Set Maximum Database Size Limit - Starts New Database After Exceeded - Example: --limitdatabase 10 (10k Database Entries) - Suggested Maximum Database Size is 50k
+                      when doing Deep Recursion
+-L LOOP, --loop LOOP  Define the Number of Main Function Loop Iterations - Infinite Loop with 0
+-d DATABASE, --database DATABASE
+                      Specify SQL Database File - Default: 'dorxng.db'
+-D DATABASEQUERY, --databasequery DATABASEQUERY
+                      Issue Database Query - Format: Regex
+-m MERGEDATABASE, --mergedatabase MERGEDATABASE
+                      Merge SQL Database File
+-t TIMEOUT, --timeout TIMEOUT
+                      Specify Timeout Interval Between Requests - Default: 4 Seconds - Disable with 0
+-r NONEWRESULTS, --nonewresults NONEWRESULTS
+                      Specify Number of Iterations with No New Results - Default: 4 (3 Attempts) - Disable with 0
+-v, --verbose         Enable Verbose Output
+-vv, --veryverbose    Enable Very Verbose Output - Displays Raw JSON Output
 ```
 
 # Tips 📝
@@ -141,7 +145,7 @@ If your database file gets exceptionally large it inevitably slows down the prog
 
 Those Python Stack Frames are Thicc. 🍑😅
 
-We've seen a marked drop in performance with database files that exceed approximately 50 thousand entries. This is likely due to how we are deduplicating the database.
+We've seen a marked drop in performance with database files that exceed approximately 50 thousand entries.
 
 The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
 ](https://www.exploit-db.com/google-hacking-database). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
