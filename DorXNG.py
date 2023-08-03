@@ -167,7 +167,7 @@ total_current_results = []
 args, server, page_iteration_mode, timer, database_name, server_list, query_list, concurrent_connections = parse_args.parse_args()
 
 # Save Original Page Iteration Number Before Entering Main
-page_iteration_number = args.number
+initial_page_iteration_number = args.number
 
 # If Loop Mode Enabled
 if args.loop == 0 or args.loop is not None:
@@ -177,7 +177,7 @@ if args.loop == 0 or args.loop is not None:
         while args.loop == 0:
 
             # Reset Page Number Per Iteration
-            args.number = page_iteration_number
+            args.number = initial_page_iteration_number
 
             # Execute Main Function N Number of Times
             if __name__ == '__main__':
