@@ -169,7 +169,7 @@ args, server, page_iteration_mode, timer, database_name, server_list, query_list
 # Save Original Page Iteration Number Before Entering Main
 initial_page_iteration_number = args.number
 
-# If Loop Mode Enabled
+# If Main Function Loop Iteration Mode Enabled
 if args.loop == 0 or args.loop is not None:
 
     # If Infinite Main Function Loop Iteration Mode
