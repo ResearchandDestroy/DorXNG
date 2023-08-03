@@ -28,6 +28,7 @@ def page_iterator(args, database_name, database_file, detect_database, exceeded_
             # Summarize Results
             print('\nTOTAL NUMBER OF RESULTS: ' + str(len(database_results)) + '\n')
             if args.loop == 0 or args.loop is not None:
+                args.query = query_list[0]
                 return args
             else:
                 exit(0)
@@ -67,6 +68,7 @@ def page_iterator(args, database_name, database_file, detect_database, exceeded_
                     # Summarize Results
                     print('\nTOTAL NUMBER OF RESULTS: ' + str(len(database_results)))
                     if args.loop == 0 or args.loop is not None:
+                        args.query = query_list[0]
                         return args
                     else:
                         exit(0)
@@ -177,6 +179,7 @@ def page_iterator(args, database_name, database_file, detect_database, exceeded_
                     # Summarize Results
                     print('\nTOTAL NUMBER OF RESULTS: ' + str(len(database_results)))
                     if args.loop == 0 or args.loop is not None:
+                        args.query = query_list[0]
                         return args
                     else:
                         exit(0)

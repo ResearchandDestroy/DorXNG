@@ -99,6 +99,7 @@ def main(args, server, server_list, query_list, previous_server,
                 search_params, search_query)
 
     else:
+
         # Gather Variable Definition from Construct URL
         page_iteration_number, reset_page_number, server, previous_server, search_params, search_query = url_construction.construct_url(
                 args, page_iteration_mode, page_iteration_number, reset_page_number,
@@ -134,7 +135,9 @@ def main(args, server, server_list, query_list, previous_server,
                       database_results, previous_results, total_current_results)
 
     # Summarize Results
-    if args.loop == 0 or args.loop is not None:
+    if args.loop == 0 and page_iteration_mode is True or args.loop is not None and page_iteration_mode is True:
+        pass
+    elif args.loop == 0 and args.querylist and page_iteration_mode is False or args.loop is not None and args.querylist and page_iteration_mode is False:
         pass
     else:
         print('\nTOTAL NUMBER OF RESULTS: ' + str(len(database_results)))
