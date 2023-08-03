@@ -1,3 +1,4 @@
+import time
 import os
 import re
 import sqlite3
@@ -254,7 +255,8 @@ def store_results(args, database_name, database_file, results_data):
 # Output Function
 def output_results(args, concurrent_connections,
                    results, list_of_raw_results,
-                   database_results, previous_results,
+                   database_name, database_results,
+                   exceeded_database, previous_results,
                    total_current_results):
 
     # Initialize Local Current Results Variable
@@ -283,4 +285,21 @@ def output_results(args, concurrent_connections,
                 print(result)
                 total_current_results.append(result)
 
-    return previous_results, total_current_results
+    # If Database Limit Set
+    if args.limitdatabase:
+
+        # If Database Lenth is Greater Than or Equal to
+        # Database Limit Times One Thousand
+        if len(database_results) >= args.limitdatabase * 1000:
+
+            # Backup Previous Database
+            os.rename('./' + database_name, './' + str(time.strftime('%H:%M:%S-')) + database_name)
+
+            # Set Exceed Database to True
+            exceeded_database = True
+
+            print("\nMaximum Database Size Exceeded.." +
+                  "\nBacking up Database: " + str(time.strftime('%H:%M:%S-')) + database_name +
+                  '\nTOTAL NUMBER OF RESULTS: ' + str(len(database_results)))
+
+    return exceeded_database, previous_results, total_current_results

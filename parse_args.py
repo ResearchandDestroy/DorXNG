@@ -46,17 +46,19 @@ def parse_args():
                         type=int,
                         help='Define the Number of Concurrent Page Requests')
 
+    parser.add_argument('-l',
+                        '--limitdatabase',
+                        type=int,
+                        help='Set Maximum Database Size Limit - '
+                        'Starts New Database After Exceeded - '
+                        'Example: --limitdatabase 10 (10k Database Entries) - '
+                        'Suggested Maximum Database Size is 50k when doing Deep Recursion')
+
     parser.add_argument('-L',
                         '--loop',
                         type=int,
-                        help='Define the Number of Main Function Loop Iterations')
-
-    parser.add_argument('-t',
-                        '--timeout',
-                        type=int,
-                        default=4,
-                        help='Specify Timeout Interval Between Requests - '
-                        'Default: 4 Seconds - Disable with 0')
+                        help='Define the Number of Main Function Loop Iterations - '
+                        'Infinite Loop with 0')
 
     parser.add_argument('-d',
                         '--database',
@@ -75,6 +77,13 @@ def parse_args():
                         '--mergedatabase',
                         type=str,
                         help='Merge SQL Database File')
+
+    parser.add_argument('-t',
+                        '--timeout',
+                        type=int,
+                        default=4,
+                        help='Specify Timeout Interval Between Requests - '
+                        'Default: 4 Seconds - Disable with 0')
 
     parser.add_argument('-r',
                         '--nonewresults',
@@ -100,7 +109,7 @@ def parse_args():
     # If no CLI Arguments Were Given Print Help
     if len(sys.argv) == 1:
         parser.print_help()
-        exit(1)
+        exit(0)
 
     # HARD CODE ME OR USE -s/--server OR -S/--serverlist
     server = 'https://172.17.0.2/search'

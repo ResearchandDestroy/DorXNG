@@ -35,32 +35,19 @@ import search
 import data_handling
 
 # Main Function
-def main():
+def main(args, server, server_list, query_list, previous_server,
+         search_params, search_query, page_iteration_mode,
+         page_iteration_number, page_number, reset_page_number,
+         concurrent_connections, concurrent_params, concurrent_pages,
+         database_name, database_file, detect_database, exceeded_database,
+         database_results, timer, no_new_results_counter, results_data,
+         previous_results, total_current_results):
 
     # Increase Maximum Recursion Depth
     sys.setrecursionlimit(10 ** 9)
 
     # Print Banner
     features.banner()
-
-    # Initialize Variables
-    server_list = []
-    query_list = []
-    previous_server = int()
-    search_params = {}
-    search_query = str()
-    page_iteration_number = int()
-    page_number = int()
-    reset_page_number = False
-    concurrent_params = []
-    concurrent_pages = int() 
-    database_file = str()
-    detect_database = False
-    database_results = [] 
-    no_new_results_counter = int()
-    results_data = []
-    previous_results = []
-    total_current_results = []
 
     # Graceful Shutdown Function
     def exit_handler(signum, frame):
@@ -69,9 +56,6 @@ def main():
 
     # Graceful Shutdown Handler
     signal.signal(signal.SIGINT, exit_handler)
-
-    # Define and Gather Arguments
-    args, server, page_iteration_mode, timer, database_name, server_list, query_list, concurrent_connections = parse_args.parse_args()
 
     # Check Verbosity
     features.verbosity(args, page_iteration_mode,
@@ -134,37 +118,104 @@ def main():
             args, database_name, database_file, results_data)
 
     # Output Search Results to STDOUT
-    previous_results, total_current_results = data_handling.output_results(
+    exceeded_database, previous_results, total_current_results = data_handling.output_results(
             args, concurrent_connections, results, list_of_raw_results,
-            database_results, previous_results, total_current_results)
+            database_name, database_results, exceeded_database,
+            previous_results, total_current_results)
 
     # If Page Iteration Mode or Query List Option is Enabled Go to Page Iterator
     if page_iteration_mode is True or args.querylist is not None:
-        iterator.page_iterator(args, database_name, database_file, detect_database,
-                      page_iteration_mode, page_iteration_number, page_number,
-                      reset_page_number, concurrent_connections, concurrent_params,
-                      concurrent_pages, timer, server, previous_server, server_list,
-                      query_list, search_params, search_query, no_new_results_counter,
-                      results_data, database_results, previous_results, total_current_results)
+        args = iterator.page_iterator(args, database_name, database_file, detect_database,
+                      exceeded_database, page_iteration_mode, page_iteration_number,
+                      page_number, reset_page_number, concurrent_connections,
+                      concurrent_params, concurrent_pages, timer, server,
+                      previous_server, server_list, query_list, search_params,
+                      search_query, no_new_results_counter, results_data,
+                      database_results, previous_results, total_current_results)
 
     # Summarize Results
-    if args.loop is not None:
+    if args.loop == 0 or args.loop is not None:
         pass
     else:
         print('\nTOTAL NUMBER OF RESULTS: ' + str(len(database_results)))
 
+    # Return Args if Main Loop Function Iteration Mode
+    return args
+
+
+# Initialize Variables
+server_list = []
+query_list = []
+previous_server = int()
+search_params = {}
+search_query = str()
+page_iteration_number = int()
+page_number = int()
+reset_page_number = False
+concurrent_params = []
+concurrent_pages = int() 
+database_file = str()
+detect_database = False
+exceeded_database = False
+database_results = [] 
+no_new_results_counter = int()
+results_data = []
+previous_results = []
+total_current_results = []
 
 # Define and Gather Arguments Before Main
-args = parse_args.parse_args()
+args, server, page_iteration_mode, timer, database_name, server_list, query_list, concurrent_connections = parse_args.parse_args()
+
+# Save Original Page Iteration Number Before Entering Main
+page_iteration_number = args.number
 
 # If Loop Mode Enabled
-if args[0].loop is not None:
-    for loop in range(args[0].loop):
-        # Execute Main Function N Number of Times
-        if __name__ == '__main__':
-            main()
-    args[0].loop = None
+if args.loop == 0 or args.loop is not None:
+
+    # If Infinite Main Function Loop Iteration Mode
+    if args.loop == 0:
+        while args.loop == 0:
+
+            # Reset Page Number Per Iteration
+            args.number = page_iteration_number
+
+            # Execute Main Function N Number of Times
+            if __name__ == '__main__':
+                args = main(args, server, server_list, query_list, previous_server,
+                            search_params, search_query, page_iteration_mode,
+                            page_iteration_number, page_number, reset_page_number,
+                            concurrent_connections, concurrent_params, concurrent_pages,
+                            database_name, database_file, detect_database, exceeded_database,
+                            database_results, timer, no_new_results_counter, results_data,
+                            previous_results, total_current_results)
+
+    # If Limited Main Function Loop Iteration Mode
+    elif args.loop > 0:
+
+        for loop in range(args.loop):
+
+            # Reset Page Number Per Iteration
+            args.number = page_iteration_number
+
+            # Execute Main Function N Number of Times
+            if __name__ == '__main__':
+                args = main(args, server, server_list, query_list, previous_server,
+                            search_params, search_query, page_iteration_mode,
+                            page_iteration_number, page_number, reset_page_number,
+                            concurrent_connections, concurrent_params, concurrent_pages,
+                            database_name, database_file, detect_database, exceeded_database,
+                            database_results, timer, no_new_results_counter, results_data,
+                            previous_results, total_current_results)
+        exit(0)
+    
 else:
+
     # Execute Main Function
     if __name__ == '__main__':
-        main()
+        main(args, server, server_list, query_list, previous_server,
+             search_params, search_query, page_iteration_mode,
+             page_iteration_number, page_number, reset_page_number,
+             concurrent_connections, concurrent_params, concurrent_pages,
+             database_name, database_file, detect_database, exceeded_database,
+             database_results, timer, no_new_results_counter, results_data,
+             previous_results, total_current_results)
