@@ -96,7 +96,7 @@ Query the DorXNG Database
 -D DATABASEQUERY, --databasequery DATABASEQUERY
                       Issue Database Query - Format: Regex
 -m MERGEDATABASE, --mergedatabase MERGEDATABASE
-                      Merge SQL Database File
+                      Merge SQL Database File - Example: --mergedatabase database.db
 -t TIMEOUT, --timeout TIMEOUT
                       Specify Timeout Interval Between Requests - Default: 4 Seconds - Disable with 0
 -r NONEWRESULTS, --nonewresults NONEWRESULTS
@@ -137,9 +137,9 @@ Running one container works perfectly fine. Running multiple is nice because eac
 
 When running `--serverlist` mode disable the `--timeout` feature so there is no delay between requests (The default delay interval is 4 seconds).
 
-Keep in mind that the more containers you run the more memory you will need. This goes for deep recursion too...
+Keep in mind that the more containers you run the more memory you will need. This goes for deep recursion too... We have disabled Python's maximum recursion limit... 🔁😉
 
-The more recursions your command goes through the more memory the process will consume. You may come back to find that the process has crashed with a `Killed` error message. If this happens your machine ran out of memory and killed the process. Not to worry though... Your database file is still good. 👍👍
+The more recursions your command goes through without returning to `main` the more memory the process will consume. You may come back to find that the process has crashed with a `Killed` error message. If this happens your machine ran out of memory and killed the process. Not to worry though... Your database file is still good. 👍👍
 
 If your database file gets exceptionally large it inevitably slows down the program and consumes more memory with each iteration...
 
@@ -147,10 +147,21 @@ Those Python Stack Frames are Thicc. 🍑😅
 
 We've seen a marked drop in performance with database files that exceed approximately 50 thousand entries.
 
-The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
-](https://www.exploit-db.com/google-hacking-database). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
+We have implemented the `--limitdatabase` option to mitigate some of these memory consumption issues. Use it in combination with `--loop` to break deep recursive iteration inside [iterator.py](https://github.com/ResearchandDestroy/DorXNG/blob/main/iterator.py) and restart from `main` right where you left off.
 
-However, when using `--querylist` iteration mode its best to use lists that are shorter than the included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst)... With one instance on a machine with `16GBs` of memory we were able to iterate over approximately six thousand queries using `./DorXNG.py -S server.lst -Q query.lst -c4 -n64 -t0` before the process crashed.
+Once you have a series of database files you can merge them all (one at a time) with `--mergedatabase`. You can even merge them all into a new database file if you specify an unused filename with `--database`.
+
+#### DO NOT merge data into a database that is currently being used by a running DorXNG process. This may cause errors and could potentially corrupt the database.
+
+The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
+](https://www.exploit-db.com/google-hacking-database) (GHDB). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
+
+We've already run through it for you... 😉 Our `ghdb.db` file contains <...> entries! 🤩 You can download it here: [ghdb.db](https://<...>/) 😉
+
+Query the database like this:
+```
+./DorXNG.py -d ghdb.db -D 'regex search string'
+```
 
 A rewrite of `DorXNG` in `Golang` is already in the works. 😉 (`GorXNG`? | `DorXNGNG`?) 😆
 
@@ -196,4 +207,19 @@ Query and Server List Iteration
 Main Function Loop Iteration Mode
 ```
 ./DorXNG.py -S server.lst -Q query.lst -c4 -n64 -t0 -L4
+```
+
+Infinite Main Function Loop Iteration Mode with a Database File Size Limit of 10k Entries
+```
+./DorXNG.py -S server.lst -Q query.lst -c4 -n64 -t0 -L0 -l10
+```
+
+Merging a Database (One at a Time) into a New Database File
+```
+./DorXNG.py -d new-database.db -m dorxng.db
+```
+
+Query a Database
+```
+./DorXNG.py -d new-database.db -D 'regex search string'
 ```
