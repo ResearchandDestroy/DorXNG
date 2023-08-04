@@ -119,7 +119,7 @@ def previous_database(args, database_name, database_file, detect_database, datab
 
             else:
 
-                print('No Database ' + str(args.mergedatabase) + ' Detected..')
+                print('No Database "' + str(args.mergedatabase) + '" Detected..')
                 exit(1)
 
             # Query Data from Database

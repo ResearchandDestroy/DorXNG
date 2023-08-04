@@ -1,3 +1,4 @@
+import os
 import argparse
 import sys
 
@@ -141,16 +142,27 @@ def parse_args():
 
     # Handle Server List Option
     if args.serverlist is not None:
-        with open(args.serverlist) as file:
-            server_list = [line.rstrip() for line in file]
+        if not os.path.exists('./' + args.serverlist):
+            print('No Server List "' + str(args.serverlist) + '" Detected..')
+            exit(1)
+
+        else:
+            with open(args.serverlist) as file:
+                server_list = [line.rstrip() for line in file]
     else:
         server_list = []
 
     # Handle Query List Option
     if args.querylist is not None:
-        with open(args.querylist) as file:
-            query_list = [line.rstrip() for line in file]
-        args.query = query_list[0]
+        if not os.path.exists('./' + args.querylist):
+            print('No Query List "' + str(args.querylist) + '" Detected..')
+            exit(1)
+
+        else:
+
+            with open(args.querylist) as file:
+                query_list = [line.rstrip() for line in file]
+            args.query = query_list[0]
     else:
         query_list = []
 

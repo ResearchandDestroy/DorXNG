@@ -46,9 +46,6 @@ def main(args, server, server_list, query_list, previous_server,
     # Increase Maximum Recursion Depth
     sys.setrecursionlimit(10 ** 9)
 
-    # Print Banner
-    features.banner()
-
     # Graceful Shutdown Function
     def exit_handler(signum, frame):
         print("\nCaught Ctrl+C.. Exiting..")
@@ -82,6 +79,9 @@ def main(args, server, server_list, query_list, previous_server,
 
         # Reset Detect Database
         detect_database = False
+
+    # Print Banner
+    features.banner()
 
     # If Query List Iteration Mode Print First Query
     if args.querylist is not None:
