@@ -117,7 +117,7 @@ Also keep in mind that we have made a sacrifice in speed for a higher degree of 
 
 Each search query you make is being issued to `7` upstream search providers... Especially with `--concurrent` queries this generates a lot of upstream requests... So have patience.
 
-Keep in mind that DorXNG will continue to append new search results to the `dorxng.db` database file if you don't use the `--database` switch to specify a different one. This probably doesn't matter for most, but if you want to keep your `OSINT` investigations seperate it's there for you. 
+Keep in mind that DorXNG will continue to append new search results to your database file. Use the `--database` switch to specify a database filename, the default filename is `dorxng.db`. This probably doesn't matter for most, but if you want to keep your `OSINT` investigations seperate it's there for you. 
 
 Four concurrent search requests seems to be the sweet spot. You can issue more, but the more queries you issue at a time the longer it takes to receive results. It also increases the likelihood you receive `HTTP/429 Too Many Requests` responses from upstream search providers on that specific Tor circuit.
 
@@ -133,7 +133,9 @@ If you see anything other than that, or if you start to see `HTTP/500` response 
 
 There really isn't a reason to run a ton of these containers... Yet... 😉 How many you run really depends on what you're doing. Each container uses approximately `1.25GBs` of RAM.
 
-Running one container works perfectly fine. Running multiple is nice because each has its own Tor curcuit thats refreshing every 10 seconds.
+Running one container works perfectly fine, except you will likely miss search results. So use `--loop` and do not disable `--timeout`.
+
+Running multiple containers is nice because each has its own Tor curcuit thats refreshing every 10 seconds.
 
 When running `--serverlist` mode disable the `--timeout` feature so there is no delay between requests (The default delay interval is 4 seconds).
 
@@ -143,11 +145,11 @@ The more recursions your command goes through without returning to `main` the mo
 
 If your database file gets exceptionally large it inevitably slows down the program and consumes more memory with each iteration...
 
-Those Python Stack Frames are Thicc. 🍑😅
+Those Python Stack Frames are Thicc... 🍑😅
 
 We've seen a marked drop in performance with database files that exceed approximately 50 thousand entries.
 
-We have implemented the `--limitdatabase` option to mitigate some of these memory consumption issues. Use it in combination with `--loop` to break deep recursive iteration inside [iterator.py](https://github.com/ResearchandDestroy/DorXNG/blob/main/iterator.py) and restart from `main` right where you left off.
+The `--limitdatabase` option has been implemented to mitigate some of these memory consumption issues. Use it in combination with `--loop` to break deep recursive iteration inside [iterator.py](https://github.com/ResearchandDestroy/DorXNG/blob/main/iterator.py) and restart from `main` right where you left off.
 
 Once you have a series of database files you can merge them all (one at a time) with `--mergedatabase`. You can even merge them all into a new database file if you specify an unused filename with `--database`.
 
@@ -156,11 +158,11 @@ Once you have a series of database files you can merge them all (one at a time) 
 The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
 ](https://www.exploit-db.com/google-hacking-database) (GHDB). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
 
-We've already run through it for you... 😉 Our `ghdb.db` file contains <...> entries! 🤩 You can download it here: [ghdb.db](https://<...>/) 😉
+We've already run through it for you... 😉 Our `ghdb.db` file contains <...> entries! 🤩 You can download it here [ghdb.db](https://<...>/) if you'd like a copy. 😉
 
-Query the database like this:
+Example querying the `ghdb.db` database:
 ```
-./DorXNG.py -d ghdb.db -D 'regex search string'
+./DorXNG.py -d ghdb.db -D '^http.*\.sql$'
 ```
 
 A rewrite of `DorXNG` in `Golang` is already in the works. 😉 (`GorXNG`? | `DorXNGNG`?) 😆
@@ -209,7 +211,7 @@ Main Function Loop Iteration Mode
 ./DorXNG.py -S server.lst -Q query.lst -c4 -n64 -t0 -L4
 ```
 
-Infinite Main Function Loop Iteration Mode with a Database File Size Limit of 10k Entries
+Infinite Main Function Loop Iteration Mode with a Database File Size Limit Set to 10k Entries
 ```
 ./DorXNG.py -S server.lst -Q query.lst -c4 -n64 -t0 -L0 -l10
 ```
