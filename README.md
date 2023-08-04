@@ -160,7 +160,7 @@ The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/
 
 We've already run through it for you... 😉 Our `ghdb.db` file contains <...> entries! 🤩 You can download it here [ghdb.db](https://<...>/) if you'd like a copy. 😉
 
-Example querying the `ghdb.db` database:
+Example of querying the `ghdb.db` database:
 ```
 ./DorXNG.py -d ghdb.db -D '^http.*\.sql$'
 ```
