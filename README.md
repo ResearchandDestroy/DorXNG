@@ -158,7 +158,7 @@ Once you have a series of database files you can merge them all (one at a time) 
 The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
 ](https://www.exploit-db.com/google-hacking-database) (GHDB). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
 
-We've already run through it for you... 😉 Our `ghdb.db` file contains over 800k entries! 🤩 You can download it here [ghdb.db](https://drive.google.com/file/d/1Fjk8D_qhbvss2nrPVDS-B6S0NtNI_Ot2/view?usp=sharing) if you'd like a copy. 😉
+We've already run through it for you... 😉 Our `ghdb.db` file contains over one million entries and counting! 🤩 You can download it here [ghdb.db](https://drive.google.com/file/d/1Fjk8D_qhbvss2nrPVDS-B6S0NtNI_Ot2/view?usp=sharing) if you'd like a copy. 😉
 
 Example of querying the `ghdb.db` database:
 ```
