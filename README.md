@@ -1,5 +1,5 @@
 # DorXNG 🔎🌎
-DorXNG is a modern solution for harvesting `OSINT` data using advanced search engine operators through multiple upstream search providers. On the backend it leverages a purpose built containerized image of [SearXNG](https://docs.searxng.org/), a self-host, hackable, privacy focused, meta-search engine.
+DorXNG is a modern solution for harvesting `OSINT` data using advanced search engine operators through multiple upstream search providers. On the backend it leverages a purpose built containerized image of [SearXNG](https://docs.searxng.org/), a self-hosted, hackable, privacy focused, meta-search engine.
 
 Our SearXNG implementation routes all search queries over the [Tor](https://www.torproject.org/) network while refreshing circuits every ten seconds with Tor's `MaxCircuitDirtiness` configuration directive. We have also disabled all of SearXNG's client side timeout features. These settings allow for evasion of search engine restrictions commonly encountered while issuing many repeated search queries.
 
