@@ -221,6 +221,11 @@ Merging a Database (One at a Time) into a New Database File
 ./DorXNG.py -d new-database.db -m dorxng.db
 ```
 
+Merge All Database Files in a Directory into a New Database File
+```
+for i in `ls *.db`; do ./DorXNG.py -d new-database.db -m $i; done
+```
+
 Query a Database
 ```
 ./DorXNG.py -d new-database.db -D 'regex search string'
