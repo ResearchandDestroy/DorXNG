@@ -17,6 +17,8 @@ We have enabled every supported upstream search engine that allows advanced sear
 - `Startpage`
 - `Yahoo`
 
+We also enable `Seznam`, `Naver`, and `Mojeek`. (`Mullvad Leta`, `Presearch`, and `Stract` have since been removed from upstream SearXNG.)
+
 For more information about what search engines SearXNG supports See: [Configured Engines](https://docs.searxng.org/user/configured_engines.html)
 
 #### Please DO NOT use the DorXNG client application against any public SearXNG instances.
@@ -55,9 +57,15 @@ If you would like to build the container yourself:
 ```
 git clone https://github.com/researchanddestroy/searxng # The URL must be all lowercase for the build process to complete
 cd searxng
-DOCKER_BUILDKIT=1 make docker.build
-docker images
-docker run <image-id>
+make container.build # Requires docker buildx (or podman)
+docker run localhost/searxng/searxng:latest
+```
+
+No `buildx`? Freeze the version and build with plain `docker build`:
+```
+./manage pyenv.install
+./local/py3/bin/python -m searx.version freeze
+docker build -f container/Dockerfile -t localhost/searxng/searxng:latest .
 ```
 By default DorXNG has a hard coded `server` variable in [parse_args.py](https://github.com/ResearchandDestroy/DorXNG/blob/main/parse_args.py) which is set to the IP address that Docker will assign to the first container you run on your machine `172.17.0.2`. This can be changed, or overwritten with `--server` or `--serverlist`.
 
@@ -71,6 +79,37 @@ Query the DorXNG Database
 ./DorXNG.py -D 'regex search string'
 ```
 
+# Host Tor Bypass 🧅
+
+Upstream search providers and SearXNG move fast, and our custom container can fall behind. If it breaks, you can skip it and run the official upstream SearXNG container instead. In this mode `Tor` runs on the host machine rather than inside the container.
+
+Install Tor on the host and set the circuit refresh interval:
+```
+sudo pacman -S tor # or: sudo apt install tor
+echo 'MaxCircuitDirtiness 10' | sudo tee -a /etc/tor/torrc
+sudo systemctl enable --now tor
+curl -x socks5h://127.0.0.1:9050 -s https://check.torproject.org/api/ip # Should return {"IsTor":true,...}
+```
+
+Run the latest upstream SearXNG container from the DorXNG directory, using our [settings.yml](https://github.com/ResearchandDestroy/DorXNG/blob/main/settings.yml):
+```
+docker run --rm \
+  --network host \
+  -v "$(pwd)/settings.yml:/etc/searxng/settings.yml:ro" \
+  searxng/searxng:latest
+```
+
+`--network host` lets the container reach the host's Tor SOCKS proxy at `127.0.0.1:9050`. The provided `settings.yml` routes every upstream request through it, enables the `json` output format, and disables SearXNG's engine ban and suspension timers.
+
+The upstream container serves plain HTTP on port `8080` (the `server.port` value in `settings.yml` is ignored), so point DorXNG at it with `--server`:
+```
+./DorXNG.py -s 'http://127.0.0.1:8080/search' -q 'search query'
+```
+
+To run more than one instance, give each one its own port with `-e SEARXNG_PORT=8081` and list them in a `--serverlist` file. Keep in mind that all of these instances share the host's single Tor circuit, unlike our custom containers, which each run their own.
+
+#### Change the `secret_key` value in `settings.yml` before exposing this instance to anything other than localhost.
+
 # Instructions 📖
 
 ```
@@ -80,7 +119,7 @@ Query the DorXNG Database
 -S SERVERLIST, --serverlist SERVERLIST
                       Issue Search Queries Across a List of Servers - Format: Newline Delimited
 -q QUERY, --query QUERY
-                      Issue a Search Query - Examples: 'search query' | '!tch search query' | 'site:example.com intext:example'
+                      Issue a Search Query - Examples: 'search query' | '!ah search query' | 'site:example.com intext:example'
 -Q QUERYLIST, --querylist QUERYLIST
                       Iterate Through a Search Query List - Format: Newline Delimited
 -n NUMBER, --number NUMBER
@@ -108,6 +147,8 @@ Query the DorXNG Database
 # Tips 📝
 
 Sometimes you will hit a Tor exit node that is already shunted by upstream search providers, causing you to receive a minimal amount of search results. Not to worry... Just keep firing off queries. 😉
+
+Onion search engines (`!ah` Ahmia, `!tch` Torch) only work while their Tor hidden service is up, and hidden services can be spotty. Ahmia has been the most reliable. Torch often times out or refuses connections for long stretches, then comes back. If you get `timeout` or `proxy error` from an onion engine, try again later. 🧅
 
 Keep your DorXNG SQL database file and rerun your command, or use the `--loop` switch to iterate the main function repeatedly. 🔁
 

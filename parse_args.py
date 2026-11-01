@@ -27,7 +27,7 @@ def parse_args():
                         type=str,
                         help='Issue a Search Query - Examples: '
                         '\'search query\' | '
-                        '\'!tch search query\' | '
+                        '\'!ah search query\' | '
                         '\'site:example.com intext:example\'')
 
     query_group.add_argument('-Q',
