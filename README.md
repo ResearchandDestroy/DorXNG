@@ -1,4 +1,7 @@
 # DorXNG 🔎🌎
+
+As seen at [Recon Village, DEF CON 31](https://www.youtube.com/watch?v=_5yEfCdOCGQ)
+
 DorXNG is a modern solution for harvesting `OSINT` data using advanced search engine operators through multiple upstream search providers. On the backend it leverages a purpose built containerized image of [SearXNG](https://docs.searxng.org/), a self-hosted, hackable, privacy focused, meta-search engine.
 
 Our SearXNG implementation routes all search queries over the [Tor](https://www.torproject.org/) network while refreshing circuits every ten seconds with Tor's `MaxCircuitDirtiness` configuration directive. We have also disabled all of SearXNG's client side timeout features. These settings allow for evasion of search engine restrictions commonly encountered while issuing many repeated search queries.
@@ -44,7 +47,7 @@ Shout out to the developers of `Tor` and `SearXNG` for making this possible. Go 
 
 Shout out to the developer of [pagodo](https://github.com/opsdisk/pagodo) for the inspiration and that sweet [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py) script!
 
-Last but certainly not least, shout out to [j0hnny](https://en.wikipedia.org/wiki/Johnny_Long). The OG Dork. 🧠🏴‍☠
+Last but certainly not least, shout out to [j0hnny](https://www.youtube.com/watch?v=fo1BR9itwOY). The OG Dork. 🧠🏴‍☠
 
 # Setup 🛠️
 
