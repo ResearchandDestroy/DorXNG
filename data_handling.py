@@ -8,7 +8,7 @@ import requests
 def database_query(args, database_name, previous_results):
 
     # Check if Database File Exists
-    if os.path.exists('./' + database_name):
+    if os.path.exists(database_name):
 
         # Define Local Variables
         database_results = []
@@ -36,13 +36,13 @@ def database_query(args, database_name, previous_results):
 def previous_database(args, database_name, database_file, detect_database, database_results, previous_results):
 
     # Check if Database File Exists
-    if os.path.exists('./' + database_name):
+    if os.path.exists(database_name):
 
         # If Merge Database
         if args.mergedatabase:
 
             # Check if Database File Exists
-            if os.path.exists('./' + args.mergedatabase):
+            if os.path.exists(args.mergedatabase):
 
                 # Create Database Connection and Cursor
                 connection = sqlite3.connect(args.mergedatabase)
@@ -112,7 +112,7 @@ def previous_database(args, database_name, database_file, detect_database, datab
         if args.mergedatabase:
 
             # Check if Database File Exists
-            if os.path.exists('./' + args.mergedatabase):
+            if os.path.exists(args.mergedatabase):
 
                 # Create Database Connection and Cursor
                 connection = sqlite3.connect(args.mergedatabase)
@@ -190,13 +190,8 @@ def prepare_data(results, concurrent_connections, previous_server):
 # Store Results in SQL Function
 def store_results(args, database_name, database_file, results_data):
 
-    # Database File Creation
-    if not database_file:
-        if not os.path.exists('./' + database_name):
-            os.mknod(database_name)
-            database_file = os.getcwd() + '/' + database_name
-
     # Create Database Connection and Cursor
+    # SQLite Creates the Database File if it Does Not Exist
     connection = sqlite3.connect(database_name)
     cursor = connection.cursor()
 
@@ -286,13 +281,15 @@ def output_results(args, concurrent_connections,
         if len(database_results) >= args.limitdatabase * 1000:
 
             # Backup Previous Database
-            os.rename('./' + database_name, './' + str(time.strftime('%H:%M:%S-')) + database_name)
+            backup_name = os.path.join(os.path.dirname(database_name),
+                                       str(time.strftime('%H:%M:%S-')) + os.path.basename(database_name))
+            os.rename(database_name, backup_name)
 
             # Set Exceed Database to True
             exceeded_database = True
 
             print("\nMaximum Database Size Exceeded.." +
-                  "\nBacking up Database: " + str(time.strftime('%H:%M:%S-')) + database_name +
+                  "\nBacking up Database: " + backup_name +
                   '\nTOTAL NUMBER OF RESULTS: ' + str(len(database_results)))
 
     return exceeded_database, previous_results, total_current_results

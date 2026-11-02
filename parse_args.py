@@ -150,7 +150,7 @@ def parse_args():
 
     # Handle Server List Option
     if args.serverlist is not None:
-        if not os.path.exists('./' + args.serverlist):
+        if not os.path.exists(args.serverlist):
             print('No Server List "' + str(args.serverlist) + '" Detected..')
             exit(1)
 
@@ -162,7 +162,7 @@ def parse_args():
 
     # Handle Query List Option
     if args.querylist is not None:
-        if not os.path.exists('./' + args.querylist):
+        if not os.path.exists(args.querylist):
             print('No Query List "' + str(args.querylist) + '" Detected..')
             exit(1)
 
