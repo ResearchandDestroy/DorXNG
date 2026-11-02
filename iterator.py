@@ -4,6 +4,18 @@ import features
 import search
 import data_handling
 
+# Initial No New Results Counter
+# Zero Disables it, the Default 4 Allows 3 Empty Iterations,
+# Anything Else is User Defined and Allows N Empty Iterations
+def initial_no_new_results_counter(args):
+    if args.nonewresults == 0:
+        return 0
+    elif args.nonewresults == 4:
+        return args.nonewresults
+    else:
+        return args.nonewresults + 1
+
+
 # Page Iterator Function
 def page_iterator(args, database_name, database_file, detect_database, exceeded_database,
                   page_iteration_mode, page_iteration_number, page_number, reset_page_number,
@@ -44,18 +56,7 @@ def page_iterator(args, database_name, database_file, detect_database, exceeded_
 
     # Set No New Results Counter
     if not no_new_results_counter and page_iteration_mode is True:
-
-        # If No New Search Results Counter is Zero it is Disabled
-        if args.nonewresults == 0:
-            pass
-
-       # If No New Search Results Counter is 4 it is Default
-        elif args.nonewresults == 4:
-            no_new_results_counter = args.nonewresults
-
-        # Anything Else is User Defined
-        else:
-            no_new_results_counter = args.nonewresults + 1
+        no_new_results_counter = initial_no_new_results_counter(args)
 
     # If Current Page Number
     # is Equal to Page Total Exit
@@ -75,7 +76,7 @@ def page_iterator(args, database_name, database_file, detect_database, exceeded_
                 # Reset Concurrent Pages, Page Number
                 # and Increment Query from List
                 else:
-                    no_new_results_counter = args.nonewresults
+                    no_new_results_counter = initial_no_new_results_counter(args)
                     args.number = 1
                     concurrent_pages = 0
                     args.query = query_list[query_list.index(args.query) + 1]
@@ -187,7 +188,7 @@ def page_iterator(args, database_name, database_file, detect_database, exceeded_
                 # Reset Page Number, Concurrent Pages
                 # and Increment Query from List
                 else:
-                    no_new_results_counter = args.nonewresults
+                    no_new_results_counter = initial_no_new_results_counter(args)
                     args.number = 1
                     concurrent_pages = 0
                     args.query = query_list[query_list.index(args.query) + 1]
