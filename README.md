@@ -137,6 +137,68 @@ This works with our custom container and with the Host Tor Bypass above. Both Se
 
 Direct queries are faster and some engines only work directly (`Yahoo`), but providers rate limit by IP address, so heavy use will get your IP throttled. SearXNG's own `!bang` shortcuts override `--no-tor`. To combine them, use the direct shortcuts: `!brd` (Brave), `!ddgwd` (DuckDuckGo), `!gocd` (Google CSE), `!s1d` (s1search), `!swd` (Swisscows), `!yhd` (Yahoo).
 
+# MCP Server 🤖
+
+DorXNG ships an [MCP](https://modelcontextprotocol.io) server (`mcp_server.py`) so AI agents like Claude Code, Claude Desktop, or any MCP client can run dork searches, drive long harvests in the background, and query the results database. It talks to the same SearXNG server(s) as the CLI, and its databases work with the CLI's `-d`, `-D`, and `-m` options.
+
+```
+pip install -r requirements.txt
+```
+
+Add it to Claude Code:
+```
+claude mcp add dorxng -e DORXNG_SERVER=https://172.17.0.2/search -- python3 /path/to/DorXNG/mcp_server.py
+```
+
+Or add it to any MCP client config (Claude Desktop, etc.):
+```json
+{
+  "mcpServers": {
+    "dorxng": {
+      "command": "python3",
+      "args": ["/path/to/DorXNG/mcp_server.py"],
+      "env": {
+        "DORXNG_SERVER": "https://172.17.0.2/search",
+        "DORXNG_DB_DIR": "/path/to/databases"
+      }
+    }
+  }
+}
+```
+
+Agents that connect over the network can use Streamable HTTP instead of stdio. It binds to `127.0.0.1` by default, and the endpoint is `http://127.0.0.1:8765/mcp`:
+```
+python3 mcp_server.py --http --port 8765
+```
+
+Environment variables:
+
+| Variable | Default | Description |
+|---|---|---|
+| `DORXNG_SERVER` | `https://172.17.0.2/search` | SearXNG server, or a comma separated server list (like `--serverlist`) |
+| `DORXNG_DB_DIR` | current directory | Where databases are read and written. Tools only accept plain `.db` file names inside it |
+| `DORXNG_DELAY` | `4` | Seconds between request batches in harvest jobs (like `--timeout`) |
+| `DORXNG_MAX_JOBS` | `4` | Maximum number of harvest jobs running at once |
+
+Tools:
+
+| Tool | Description |
+|---|---|
+| `server_status` | Reachability of each server, plus its Tor, direct (`--no-tor`) and onion engines |
+| `search` | Run a dork for up to 10 pages, store the results, and return the ones that are new to the database |
+| `start_harvest` | Background harvest of many queries, or a bundled dork list (`ghdb` / `operators`), with pages, loops (0 = until stopped), and a no new results limit. Returns a `job_id` |
+| `job_status` / `list_jobs` / `stop_job` | Follow a harvest's progress and newest results, or stop it |
+| `query_database` | Regex search over titles and URLs (like `-D`) |
+| `database_stats` | Row counts, results per query, and top domains |
+| `list_databases` / `merge_databases` | List databases, or merge one into another (like `-m`) |
+| `list_dorks` | Page through and filter the bundled GHDB dork list and `operators.lst` |
+
+It also provides the `dorxng://operators` and `dorxng://readme` resources, and a `dork_recon` prompt that walks an agent through reconnaissance of one domain.
+
+`search` and `start_harvest` take a `no_tor` argument. It defaults to `false`, and setting it exposes the SearXNG host's IP address to the search providers, exactly like `--no-tor`.
+
+#### The same rule applies to agents: DO NOT point DorXNG at public SearXNG instances.
+
 # Instructions 📖
 
 ```
