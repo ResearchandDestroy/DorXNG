@@ -13,6 +13,7 @@ import os
 import re
 import sqlite3
 import sys
+from typing import Any
 
 import requests
 from mcp.server import MCPServer
@@ -24,6 +25,7 @@ import dorxng_core as core
 HERE = os.path.dirname(os.path.abspath(__file__))
 LISTS = {'ghdb': os.path.join(HERE, 'query.lst'), 'operators': os.path.join(HERE, 'operators.lst')}
 MAX_SEARCH_PAGES = 10
+SEARCH_RETRIES = 2  # quick searches give up on a failing server instead of retrying until stopped
 
 INSTRUCTIONS = """DorXNG harvests OSINT data with advanced search operators (Google dorks) through a
 self-hosted SearXNG instance that routes every query over Tor by default.
@@ -69,7 +71,7 @@ def _engines(no_tor, servers):
 
 @mcp.tool(annotations=READ_ONLY)
 @expected_errors
-def server_status(server: str | None = None) -> dict:
+def server_status(server: str | None = None) -> dict[str, Any]:
     """Check that the DorXNG SearXNG server(s) are reachable and list their Tor, direct (--no-tor) and
     onion engines. `server` defaults to DORXNG_SERVER; pass a comma separated list for several."""
     return {'servers': [core.server_status(s) for s in _servers(server)]}
@@ -78,7 +80,7 @@ def server_status(server: str | None = None) -> dict:
 @mcp.tool(annotations=SEARCHES)
 @expected_errors
 def search(query: str, pages: int = 1, concurrent: int = 4, no_tor: bool = False,
-           database: str = 'dorxng.db', server: str | None = None) -> dict:
+           database: str = 'dorxng.db', server: str | None = None) -> dict[str, Any]:
     """Run a dork query for pages 1..`pages` (max 10 per call), store every result in `database` and
     return the results that were not already in it, plus engine errors.
 
@@ -88,7 +90,7 @@ def search(query: str, pages: int = 1, concurrent: int = 4, no_tor: bool = False
     pages = max(1, min(pages, MAX_SEARCH_PAGES))
     servers = _servers(server)
     totals = core.search_pages(servers, query, pages, concurrent, _engines(no_tor, servers), delay=0,
-                               database=database, no_new_results=0)
+                               database=database, no_new_results=0, retries=SEARCH_RETRIES)
     return {
         'query': query, 'mode': 'direct (no Tor)' if no_tor else 'Tor', 'database': database,
         'pages': totals['pages'], 'results_returned': totals['results'], 'new_results': len(totals['new']),
@@ -101,12 +103,15 @@ def search(query: str, pages: int = 1, concurrent: int = 4, no_tor: bool = False
 @expected_errors
 def start_harvest(queries: list[str] | None = None, dork_list: str | None = None, pages: int = 64,
                   concurrent: int = 4, loops: int = 1, no_new_results: int = 4, no_tor: bool = False,
-                  database: str = 'dorxng.db', server: str | None = None, delay: float | None = None) -> dict:
+                  database: str = 'dorxng.db', server: str | None = None, delay: float | None = None) -> dict[str, Any]:
     """Start a background harvest (like `DorXNG.py -Q list -c4 -n64 -L1`) and return a job_id at once.
 
     queries: dork queries to run, or dork_list: 'ghdb' (every GHDB dork, ~8k) / 'operators'.
     pages: pages per query. loops: passes over all queries (0 = run until stopped).
-    no_new_results: move to the next query after this many batches without new URLs (0 = never).
+    no_new_results: same as the CLI's -r/--nonewresults. Batches that return no results at all count
+    against it; when it runs out the job moves to the next query. Default 4 = 3 empty batches,
+    any other N = N empty batches, 0 = never. Only applies when pages > 1.
+    Failed requests (HTTP/connection errors) are resent until they succeed or the job is stopped.
     delay: seconds between batches (default DORXNG_DELAY, 4). no_tor exposes the SearXNG host's IP.
     Poll with job_status, stop with stop_job. Results land in `database` as they arrive."""
     if dork_list:
@@ -125,7 +130,7 @@ def start_harvest(queries: list[str] | None = None, dork_list: str | None = None
 
 @mcp.tool(annotations=READ_ONLY)
 @expected_errors
-def job_status(job_id: str) -> dict:
+def job_status(job_id: str) -> dict[str, Any]:
     """Progress of a harvest job: state, current query and pages, counts and the 20 newest results."""
     return jobs.get(job_id).status()
 
@@ -133,14 +138,14 @@ def job_status(job_id: str) -> dict:
 @mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True,
                                       open_world_hint=False))
 @expected_errors
-def stop_job(job_id: str) -> dict:
+def stop_job(job_id: str) -> dict[str, Any]:
     """Stop a running harvest job. Results gathered so far stay in its database."""
     return jobs.stop(job_id).status()
 
 
 @mcp.tool(annotations=READ_ONLY)
 @expected_errors
-def list_jobs() -> dict:
+def list_jobs() -> dict[str, Any]:
     """All harvest jobs started by this server, newest first."""
     ordered = sorted(jobs.jobs.values(), key=lambda j: j.started, reverse=True)
     return {'jobs': [{k: v for k, v in j.status().items() if k != 'recent_new_results'} for j in ordered]}
@@ -148,7 +153,7 @@ def list_jobs() -> dict:
 
 @mcp.tool(annotations=READ_ONLY)
 @expected_errors
-def query_database(pattern: str, database: str = 'dorxng.db', limit: int = 200) -> dict:
+def query_database(pattern: str, database: str = 'dorxng.db', limit: int = 200) -> dict[str, Any]:
     """Regex search (case insensitive) over result titles and URLs, like `DorXNG.py -D`.
     Example patterns: '\\.sql$', 'admin|login', '^https?://[^/]*\\.gov/'."""
     return core.query_database(database, pattern, max(1, min(limit, 2000)))
@@ -156,14 +161,14 @@ def query_database(pattern: str, database: str = 'dorxng.db', limit: int = 200) 
 
 @mcp.tool(annotations=READ_ONLY)
 @expected_errors
-def database_stats(database: str = 'dorxng.db') -> dict:
+def database_stats(database: str = 'dorxng.db') -> dict[str, Any]:
     """Row counts, results per query and the most common domains in a database."""
     return core.database_stats(database)
 
 
 @mcp.tool(annotations=READ_ONLY)
 @expected_errors
-def list_databases() -> dict:
+def list_databases() -> dict[str, Any]:
     """DorXNG databases (*.db) in DORXNG_DB_DIR with their row counts."""
     return core.list_databases()
 
@@ -171,14 +176,14 @@ def list_databases() -> dict:
 @mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True,
                                       open_world_hint=False))
 @expected_errors
-def merge_databases(source: str, target: str) -> dict:
+def merge_databases(source: str, target: str) -> dict[str, Any]:
     """Merge every row of `source` into `target` (created if missing), like `DorXNG.py -d target -m source`."""
     return core.merge_databases(source, target)
 
 
 @mcp.tool(annotations=READ_ONLY)
 @expected_errors
-def list_dorks(source: str = 'ghdb', filter: str | None = None, limit: int = 50, offset: int = 0) -> dict:
+def list_dorks(source: str = 'ghdb', filter: str | None = None, limit: int = 50, offset: int = 0) -> dict[str, Any]:
     """Page through bundled dork lists. source: 'ghdb' (Google Hacking Database, ~8k dorks) or
     'operators' (one query per advanced search operator). filter: optional case insensitive regex."""
     if source not in LISTS:

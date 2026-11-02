@@ -186,7 +186,7 @@ Tools:
 |---|---|
 | `server_status` | Reachability of each server, plus its Tor, direct (`--no-tor`) and onion engines |
 | `search` | Run a dork for up to 10 pages, store the results, and return the ones that are new to the database |
-| `start_harvest` | Background harvest of many queries, or a bundled dork list (`ghdb` / `operators`), with pages, loops (0 = until stopped), and a no new results limit. Returns a `job_id` |
+| `start_harvest` | Background harvest of many queries, or a bundled dork list (`ghdb` / `operators`), with the same pages, loops (0 = until stopped) and `--nonewresults` behavior as the CLI. Returns a `job_id` |
 | `job_status` / `list_jobs` / `stop_job` | Follow a harvest's progress and newest results, or stop it |
 | `query_database` | Regex search over titles and URLs (like `-D`) |
 | `database_stats` | Row counts, results per query, and top domains |

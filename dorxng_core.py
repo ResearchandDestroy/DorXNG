@@ -48,13 +48,16 @@ def search_page(server, query, pageno=1, engines=None):
         response = requests.post(server, params, headers=HEADERS, verify=False, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
         data = response.json()
-    except requests.exceptions.RequestException as error:
-        return {'results': [], 'unresponsive_engines': [], 'error': str(error)}
+    # requests' JSONDecodeError is also a RequestException: catch it first so a non-JSON page
+    # counts as an empty batch (like the CLI) instead of being resent
     except ValueError:
-        return {'results': [], 'unresponsive_engines': [], 'error': 'invalid JSON response'}
+        return {'results': [], 'unresponsive_engines': [], 'error': 'invalid JSON response', 'retry': False}
+    except requests.exceptions.RequestException as error:
+        return {'results': [], 'unresponsive_engines': [], 'error': str(error), 'retry': True}
     results = [{'title': r.get('title') or '', 'url': r.get('url') or '', 'engines': r.get('engines', [])}
                for r in data.get('results', []) if r.get('url')]
-    return {'results': results, 'unresponsive_engines': data.get('unresponsive_engines', []), 'error': None}
+    return {'results': results, 'unresponsive_engines': data.get('unresponsive_engines', []), 'error': None,
+            'retry': False}
 
 
 def config_url(server):
@@ -224,42 +227,82 @@ def read_list(path):
         return [line.rstrip('\n') for line in f if line.strip()]
 
 
+# No New Results Counter (Same Rules as the DorXNG CLI -r/--nonewresults)
+def empty_batch_attempts(no_new_results, pages):
+    """Empty batches allowed before moving on: 0 disables, the default 4 means 3 attempts,
+    any other N means N attempts. Like the CLI, only active when iterating pages (pages > 1)."""
+    if not no_new_results or pages <= 1:
+        return 0
+    return 3 if no_new_results == 4 else no_new_results
+
+
 # Paging Engine
 def search_pages(servers, query, pages, concurrent=4, engines=None, delay=None, database='dorxng.db',
-                 no_new_results=4, stop_event=None, on_batch=None):
+                 no_new_results=4, stop_event=None, on_batch=None, count_first_batch=True, retries=None,
+                 full_batches=False, on_retry=None):
     """Search pages 1..pages in concurrent batches, rotating servers per batch.
 
-    Stops early after `no_new_results` consecutive batches without new URLs (0 disables).
+    Like the CLI, a batch that returns no results at all counts against `no_new_results`
+    (see empty_batch_attempts); batches with results do not reset the count. The CLI never
+    counts the first batch of a loop pass, so harvests pass count_first_batch=False for it.
+
+    Also like the CLI, a batch with an HTTP/connection error is resent on the next server after
+    a pause (`delay`, at least 1 second); `retries` caps the resends (None = until stopped).
+    full_batches: always request `concurrent` pages per batch, like the CLI (-n10 -c4 requests
+    pages 1-12); otherwise stop exactly at `pages`.
+    on_batch(query, batch, results, new, errors) runs after each batch; on_retry(query, batch, errors)
+    runs before each resend, so callers can see failures while a batch is still being retried.
     """
     delay = default_delay() if delay is None else delay
     rotation = itertools.cycle(servers)
     concurrent = max(1, concurrent)
     totals = {'pages': 0, 'results': 0, 'new': [], 'errors': [], 'unresponsive_engines': Counter(),
               'stopped_early': False}
+    attempts = empty_batch_attempts(no_new_results, pages)
     empty_batches = 0
     for start in range(1, pages + 1, concurrent):
         if stop_event is not None and stop_event.is_set():
             break
-        batch = list(range(start, min(start + concurrent, pages + 1)))
-        server = next(rotation)
-        with ThreadPoolExecutor(max_workers=len(batch)) as pool:
-            responses = list(pool.map(lambda p: search_page(server, query, p, engines), batch))
+        batch = list(range(start, start + concurrent if full_batches else min(start + concurrent, pages + 1)))
+        resends = 0
+        while True:
+            attempt_errors = []
+            server = next(rotation)
+            with ThreadPoolExecutor(max_workers=len(batch)) as pool:
+                responses = list(pool.map(lambda p: search_page(server, query, p, engines), batch))
+            for resp in responses:
+                if resp['error']:
+                    totals['errors'].append(resp['error'])
+                    attempt_errors.append(resp['error'])
+                for name, reason in resp['unresponsive_engines']:
+                    totals['unresponsive_engines'][f'{name}: {reason}'] += 1
+            if not any(resp['retry'] for resp in responses):
+                break
+            if retries is not None and resends >= retries:
+                break
+            resends += 1
+            if on_retry:
+                on_retry(query, batch, attempt_errors)
+            pause = max(delay or 0, 1)
+            if stop_event is not None:
+                if stop_event.wait(pause):
+                    break
+            else:
+                time.sleep(pause)
+        if stop_event is not None and stop_event.is_set() and any(resp['retry'] for resp in responses):
+            break
         batch_results = [r for resp in responses for r in resp['results']]
-        for resp in responses:
-            if resp['error']:
-                totals['errors'].append(resp['error'])
-            for name, reason in resp['unresponsive_engines']:
-                totals['unresponsive_engines'][f'{name}: {reason}'] += 1
         new = store_results(database, query, batch_results)
         totals['pages'] += len(batch)
         totals['results'] += len(batch_results)
         totals['new'] += new
         if on_batch:
-            on_batch(query, batch, batch_results, new, [r['error'] for r in responses if r['error']])
-        empty_batches = 0 if new else empty_batches + 1
-        if no_new_results and empty_batches >= no_new_results:
-            totals['stopped_early'] = True
-            break
+            on_batch(query, batch, batch_results, new, attempt_errors)
+        if not batch_results and (count_first_batch or start > 1):
+            empty_batches += 1
+            if attempts and empty_batches >= attempts:
+                totals['stopped_early'] = True
+                break
         if start + concurrent <= pages and delay:
             if stop_event is not None:
                 if stop_event.wait(delay):
@@ -289,11 +332,20 @@ class Job:
         self.new_results = 0
         self.errors = 0
         self.last_error = None
+        self.retrying = False
         self.recent = deque(maxlen=20)
         self.stop_event = threading.Event()
         self.thread = threading.Thread(target=self._run, name=f'dorxng-job-{self.id}', daemon=True)
 
+    def _on_retry(self, query, batch, errors):
+        self.current_query, self.current_pages = query, f'{batch[0]}-{batch[-1]}'
+        self.errors += len(errors)
+        self.retrying = True
+        if errors:
+            self.last_error = errors[-1]
+
     def _on_batch(self, query, batch, results, new, errors):
+        self.retrying = False
         self.current_query, self.current_pages = query, f'{batch[0]}-{batch[-1]}'
         self.pages_done += len(batch)
         self.results_seen += len(results)
@@ -308,11 +360,13 @@ class Job:
         try:
             loop_iter = itertools.count(1) if self.loops == 0 else range(1, self.loops + 1)
             for self.loop in loop_iter:
-                for query in self.queries:
+                for index, query in enumerate(self.queries):
                     if self.stop_event.is_set():
                         break
+                    # The CLI issues the first batch of each loop pass before its counter starts
                     search_pages(self.servers, query, self.pages, self.concurrent, self.engines, self.delay,
-                                 self.database, self.no_new_results, self.stop_event, self._on_batch)
+                                 self.database, self.no_new_results, self.stop_event, self._on_batch,
+                                 count_first_batch=index > 0, full_batches=True, on_retry=self._on_retry)
                 if self.stop_event.is_set():
                     break
             self.state = 'stopped' if self.stop_event.is_set() else 'finished'
@@ -330,6 +384,7 @@ class Job:
             'current_query': self.current_query, 'current_pages': self.current_pages,
             'pages_done': self.pages_done, 'results_seen': self.results_seen,
             'new_results': self.new_results, 'errors': self.errors, 'last_error': self.last_error,
+            'retrying_failed_batch': self.retrying and self.state == 'running',
             'elapsed_seconds': round(end - self.started), 'mode': 'direct (no Tor)' if self.engines else 'Tor',
             'recent_new_results': list(self.recent),
         }
