@@ -1,4 +1,5 @@
 import concurrent.futures
+import time
 import requests
 
 # Search Query Function
@@ -51,10 +52,13 @@ def issue_search(args, server, server_list, previous_server,
                     responses.raise_for_status()
 
             # HTTP Error Handling for Concurrent Requests with Server List Iteration
-            except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as error:
+            except requests.exceptions.RequestException as error:
                 print("\nReceived an Invalid Response..")
                 print(error)
                 print("Trying Next Server..\n")
+
+                # Wait Before Retrying a Failed Request
+                time.sleep(args.timeout if args.timeout else 1)
 
                 # Issue Iterated Search Query
                 results = issue_search(args, server, server_list, previous_server, page_iteration_mode,
@@ -78,7 +82,7 @@ def issue_search(args, server, server_list, previous_server,
                     responses.raise_for_status()
 
             # HTTP Error Handling for Concurrent Requests
-            except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as error:
+            except requests.exceptions.RequestException as error:
                 if args.querylist is not None or page_iteration_mode is True:
                     print("\nReceived an Invalid Response..")
                     print(error)
@@ -100,6 +104,9 @@ def issue_search(args, server, server_list, previous_server,
                         if previous_server != 0:
                             server = server_list[previous_server - 1]
                             previous_server = server_list.index(server) + 2
+
+                    # Wait Before Retrying a Failed Request
+                    time.sleep(args.timeout if args.timeout else 1)
 
                     # Issue Iterated Search Query
                     results = issue_search(args, server, server_list, previous_server, page_iteration_mode,
@@ -125,7 +132,7 @@ def issue_search(args, server, server_list, previous_server,
             results.raise_for_status()
 
         # HTTP Error Handling for Single Requests
-        except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as error:
+        except requests.exceptions.RequestException as error:
             if args.querylist is not None or page_iteration_mode is True:
                 print("\nReceived an Invalid Response..")
                 print(error)
@@ -147,6 +154,9 @@ def issue_search(args, server, server_list, previous_server,
                     if previous_server != 0:
                         server = server_list[previous_server - 1]
                         previous_server = server_list.index(server) + 2
+
+                # Wait Before Retrying a Failed Request
+                time.sleep(args.timeout if args.timeout else 1)
 
                 # Issue Iterated Search Query
                 results = issue_search(args, server, server_list, previous_server, page_iteration_mode,

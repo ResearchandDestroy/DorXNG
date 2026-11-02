@@ -3,6 +3,7 @@ import os
 import re
 import sqlite3
 import pprint
+import requests
 
 def database_query(args, database_name, previous_results):
 
@@ -145,48 +146,39 @@ def prepare_data(results, concurrent_connections, previous_server):
 
     # Initialize the Results Data List
     list_of_raw_results = []
-    list_of_results = []
-    results_list = []
     results_data = []
 
+    # Unpack Nested Results Data
+    # Every Retried Request Wraps its Results as (results, previous_server)
+    while type(results) == tuple:
+        results, previous_server = results
+
     # If Results are from Concurrent Requests Unpack Them
+    responses = []
     if type(results) == list:
-        for number in range(concurrent_connections):
-            responses = results[number].result()
-            list_of_raw_results.append(responses.json())
-            list_of_results.append(responses.json()['results'])
+        for future in results:
+            try:
+                responses.append(future.result())
+            except requests.exceptions.RequestException as error:
+                print("\nReceived an Invalid Response.. Skipping..")
+                print(error)
 
-        # Create a List of Dictionaries from Each Request
-        for entry in list_of_results:
-            for results in entry:
-                    results_entry = {'title': results['title'],
-                                     'url': results['url']}
-                    results_data.append(results_entry)
+    # Single Request Results
+    # An Errored Request in Main Function Loop Iteration Mode Returns None
+    elif results is not None:
+        responses.append(results)
 
-    else:
-        if type(results) == tuple:
+    # Create a List of Dictionaries from Each Request
+    for response in responses:
+        try:
+            raw_results_dict = response.json()
+        except ValueError:
+            print("\nReceived an Invalid JSON Response.. Skipping..")
+            continue
 
-            # Unpack Nested Results Data
-            raw_results, previous_server = results
+        list_of_raw_results.append(raw_results_dict)
 
-            for number in range(concurrent_connections):
-                responses = raw_results[number].result()
-                list_of_raw_results.append(responses.json())
-                list_of_results.append(responses.json()['results'])
-
-            # Create a List of Dictionaries from Each Request
-            for entry in list_of_results:
-                for results in entry:
-                        results_entry = {'title': results['title'],
-                                         'url': results['url']}
-                        results_data.append(results_entry)
-
-        else:
-            raw_results_dict = results.json()
-            results_list = raw_results_dict['results']
-
-        # Create a List of Dictionaries for Each Result
-        for results_dict in results_list:
+        for results_dict in raw_results_dict.get('results', []):
             results_entry = {'title': results_dict['title'],
                              'url': results_dict['url']}
             results_data.append(results_entry)
@@ -271,7 +263,8 @@ def output_results(args, concurrent_connections,
     if not concurrent_connections and args.veryverbose is True:
 
         # Print Raw Search Results to STDOUT
-        pprint.pprint(results[0].json())
+        for raw_results in list_of_raw_results:
+            pprint.pprint(raw_results)
 
     # Pretty Print Raw JSON Reponses in Very Verbose Mode for Concurrent Page Mode
     elif concurrent_connections > 0 and args.veryverbose is True:
