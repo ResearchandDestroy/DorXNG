@@ -1,0 +1,57 @@
+site:su hacker
+site:gov.uk passport
+site:wikipedia.org tor network
+site:docs.python.org asyncio
+site:edu -site:harvard.edu admissions
+host:github.com security advisory
+filetype:pdf 1284x
+filetype:xlsx budget
+filetype:docx resume template
+filetype:sql "INSERT INTO" users
+filetype:log error
+filetype:env DB_PASSWORD
+filetype:txt robots
+ext:pdf annual report
+mime:pdf annual report
+inurl:admin login
+allinurl:wp-content uploads
+url:wiki linux
+intitle:"index of" backup
+intitle:dashboard grafana
+allintitle:privacy policy generator
+"the quick brown fox jumps"
+intext:"confidential" memo
+allintext:raspberry pi kubernetes
+inbody:checksum sha256
+inpage:mitochondria biology
+jaguar -car -cars
+python -snake
+"wireshark" OR "tcpdump" tutorial
+nmap | masscan cheatsheet
+docker AND podman comparison
++bitcoin +lightning network
+site:gov (budget OR spending) filetype:pdf
+"index of * backup"
+security AROUND(3) vulnerability
+camera $300..$500
+linux kernel release after:2026-01-01
+linux kernel release before:2015-01-01
+inanchor:"click here" download
+allinanchor:best vpn review
+related:torproject.org
+link:torproject.org
+info:torproject.org
+cache:torproject.org
+define:entropy
+ip:1.1.1.1
+loc:de bundesliga
+language:fr recette
+lang:de nachrichten
+feed:security
+hasfeed:infosec
+contains:pdf whitepaper
+intitle:"index of" "parent directory"
+inurl:wp-content filetype:sql
+site:github.com filetype:env "DB_PASSWORD"
+site:gov filetype:pdf budget
+site:github.com "api_key"

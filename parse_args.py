@@ -1,6 +1,8 @@
 import os
 import argparse
 import sys
+import urllib.parse
+import requests
 
 # CLI Arguments
 def parse_args():
@@ -93,6 +95,12 @@ def parse_args():
                         help='Specify Number of Iterations with No New Results - '
                         'Default: 4 (3 Attempts) - Disable with 0')
 
+    parser.add_argument('--no-tor',
+                        help='Bypass Tor - SearXNG Queries Upstream Search Providers Directly - '
+                        'Exposes the SearXNG Host IP Address to Search Providers - '
+                        'Default: Tor',
+                        action='store_true')
+
     verbosity_group.add_argument('-v',
                         '--verbose',
                         help='Enable Verbose Output',
@@ -165,6 +173,38 @@ def parse_args():
             args.query = query_list[0]
     else:
         query_list = []
+
+    # Handle Tor Bypass Option
+    # Direct (No Tor) Engines are Named '<engine> direct' on the SearXNG Server
+    args.engines = None
+    if args.no_tor is True:
+        requests.packages.urllib3.disable_warnings()
+        direct_engines = None
+
+        for target in server_list or [server]:
+            config_url = urllib.parse.urljoin(target, 'config')
+
+            try:
+                config = requests.get(config_url, verify=False, timeout=30).json()
+            except (requests.RequestException, ValueError):
+                print('Unable to Fetch SearXNG Config from "' + config_url + '"..')
+                exit(1)
+
+            engines = {engine['name'] for engine in config.get('engines', [])
+                       if engine['name'].endswith(' direct')}
+
+            if not engines:
+                print('No Direct (No Tor) Engines Configured on "' + target + '"..')
+                exit(1)
+
+            direct_engines = engines if direct_engines is None else direct_engines & engines
+
+        # Only Use Direct Engines Available on Every Server
+        if not direct_engines:
+            print('No Direct (No Tor) Engines Shared by All Servers in "' + str(args.serverlist) + '"..')
+            exit(1)
+
+        args.engines = ','.join(sorted(direct_engines))
 
     # Handle Concurrency Option
     if args.concurrent is not None:

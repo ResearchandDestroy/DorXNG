@@ -57,6 +57,11 @@ def construct_url(args, page_iteration_mode, page_iteration_number,
         args.query = args.query[:0] + '!' + args.query[0:]
         search_params = {'q': args.query, 'format': 'json', 'pageno': args.number}
 
+    # If Tor Bypass Enabled Only Use Direct (No Tor) Engines
+    if getattr(args, 'engines', None):
+        search_params['engines'] = args.engines
+        encoded_params = encoded_params + '&' + urllib.parse.urlencode({'engines': args.engines})
+
     # Construct Search Query URL
     search_query = server + '?' + encoded_params
 

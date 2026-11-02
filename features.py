@@ -21,6 +21,7 @@ def verbosity(args, page_iteration_mode,
         print('Page Iteration Mode: ' + str(page_iteration_mode))
         print('Query List Iteration Mode: ' + str(bool(args.querylist)))
         print('Server List Iteration Mode: ' + str(bool(args.serverlist)))
+        print('Tor: ' + ('Bypassed - Direct Engines: ' + str(args.engines) if args.no_tor else 'Enabled'))
 
         if page_iteration_mode is True:
             print('Page Iterations: ' + str(args.number))

@@ -7,17 +7,30 @@ The DorXNG client application is written in Python3, and interacts with the Sear
 
 ![DorXNG](demo.gif)
 
-We have enabled every supported upstream search engine that allows advanced search operator queries:
+We only enable upstream search engines that actually honor advanced search operators. Every general and web engine in SearXNG (91 of them) was tested on 2026-11-01 against [operators.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/operators.lst), a 57 query suite covering every documented operator, both over Tor and directly. Engines that ignore operators, or serve unrelated results, are disabled because they pollute the database with noise.
 
-- `Google`
-- `DuckDuckGo`
-- `Qwant`
-- `Bing`
+Enabled over Tor (default):
+
 - `Brave`
+- `DuckDuckGo` (web endpoint)
+- `Google CSE`
+- `GMX`
+- `s1search`
 - `Startpage`
+- `Swisscows`
+
+Enabled with `--no-tor` (direct):
+
+- `Brave`
+- `DuckDuckGo` (web endpoint)
+- `Google CSE`
+- `s1search`
+- `Swisscows`
 - `Yahoo`
 
-We also enable `Seznam`, `Naver`, and `Mojeek`. (`Mullvad Leta`, `Presearch`, and `Stract` have since been removed from upstream SearXNG.)
+These engines scored 92 to 100% on `site:` and `filetype:` dorks. `Yahoo` is direct only: through Tor it returns results unrelated to the query. `Bing`, `Naver`, `Yandex`, and most smaller engines ignore operators, and `Google` and `Qwant` block SearXNG entirely, so they are all disabled.
+
+No engine strictly honors `inurl:` or `allinurl:` (they are treated as ranking hints), so expect some noise on those dorks. `site:`, `filetype:`, and `intitle:` are reliable.
 
 For more information about what search engines SearXNG supports See: [Configured Engines](https://docs.searxng.org/user/configured_engines.html)
 
@@ -93,13 +106,14 @@ curl -x socks5h://127.0.0.1:9050 -s https://check.torproject.org/api/ip # Should
 
 Run the latest upstream SearXNG container from the DorXNG directory, using our [settings.yml](https://github.com/ResearchandDestroy/DorXNG/blob/main/settings.yml):
 ```
+docker pull searxng/searxng:latest
 docker run --rm \
   --network host \
   -v "$(pwd)/settings.yml:/etc/searxng/settings.yml:ro" \
   searxng/searxng:latest
 ```
 
-`--network host` lets the container reach the host's Tor SOCKS proxy at `127.0.0.1:9050`. The provided `settings.yml` routes every upstream request through it, enables the `json` output format, and disables SearXNG's engine ban and suspension timers.
+`--network host` lets the container reach the host's Tor SOCKS proxy at `127.0.0.1:9050`. The provided `settings.yml` layers on top of the container's own defaults: it routes every upstream request through Tor, enables the `json` output format, disables SearXNG's engine ban and suspension timers, enables only the validated engines, and includes the direct engines used by `--no-tor`. SearXNG refuses to start if it cannot reach Tor, so start Tor on the host first.
 
 The upstream container serves plain HTTP on port `8080` (the `server.port` value in `settings.yml` is ignored), so point DorXNG at it with `--server`:
 ```
@@ -109,6 +123,19 @@ The upstream container serves plain HTTP on port `8080` (the `server.port` value
 To run more than one instance, give each one its own port with `-e SEARXNG_PORT=8081` and list them in a `--serverlist` file. Keep in mind that all of these instances share the host's single Tor circuit, unlike our custom containers, which each run their own.
 
 #### Change the `secret_key` value in `settings.yml` before exposing this instance to anything other than localhost.
+
+# Bypassing Tor 🚀
+
+Tor is the default. If you would rather have SearXNG query the upstream search providers directly, add `--no-tor`:
+```
+./DorXNG.py -q 'site:example.com intext:example' --no-tor
+```
+
+This works with our custom container and with the Host Tor Bypass above. Both SearXNG configurations include a second, Tor free copy of each validated engine (named `<engine> direct`, disabled by default). With `--no-tor`, DorXNG asks the server for its direct engines and only uses those. Without it, nothing changes.
+
+#### `--no-tor` exposes the public IP address of the machine running SearXNG to every search provider you query.
+
+Direct queries are faster and some engines only work directly (`Yahoo`), but providers rate limit by IP address, so heavy use will get your IP throttled. SearXNG's own `!bang` shortcuts override `--no-tor`. To combine them, use the direct shortcuts: `!brd` (Brave), `!ddgwd` (DuckDuckGo), `!gocd` (Google CSE), `!s1d` (s1search), `!swd` (Swisscows), `!yhd` (Yahoo).
 
 # Instructions 📖
 
@@ -140,6 +167,7 @@ To run more than one instance, give each one its own port with `-e SEARXNG_PORT=
                       Specify Timeout Interval Between Requests - Default: 4 Seconds - Disable with 0
 -r NONEWRESULTS, --nonewresults NONEWRESULTS
                       Specify Number of Iterations with No New Results - Default: 4 (3 Attempts) - Disable with 0
+--no-tor              Bypass Tor - SearXNG Queries Upstream Search Providers Directly - Exposes the SearXNG Host IP Address to Search Providers - Default: Tor
 -v, --verbose         Enable Verbose Output
 -vv, --veryverbose    Enable Very Verbose Output - Displays Raw JSON Output
 ```
@@ -199,6 +227,8 @@ Once you have a series of database files you can merge them all (one at a time) 
 The included [query.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/query.lst) file is every dork that currently exists on the [Google Hacking Database
 ](https://www.exploit-db.com/google-hacking-database) (GHDB). See: [ghdb_scraper.py](https://github.com/opsdisk/pagodo/blob/master/ghdb_scraper.py)
 
+The included [operators.lst](https://github.com/ResearchandDestroy/DorXNG/blob/main/operators.lst) file exercises every advanced search operator (`site:`, `-site:`, `filetype:`, `ext:`, `inurl:`, `allinurl:`, `intitle:`, `allintitle:`, `intext:`, `"phrases"`, `-term`, `OR`, `AND`, `( )`, `*`, `AROUND(n)`, `..` ranges, `before:`, `after:`, `related:`, and the Bing, Brave, and Yandex specific ones). It is the list we used to choose which engines to enable. Run it yourself with `./DorXNG.py -Q operators.lst` to see how your instance behaves.
+
 We've already run through it for you... 😉 Our `ghdb.db` file contains over one million entries and counting! 🤩 You can download it here [ghdb.db](https://drive.google.com/file/d/1Fjk8D_qhbvss2nrPVDS-B6S0NtNI_Ot2/view?usp=sharing) if you'd like a copy. 😉
 
 Example of querying the `ghdb.db` database:
@@ -240,6 +270,11 @@ Server List Iteration Mode
 Query List Iteration Mode
 ```
 ./DorXNG.py -Q query.lst -c4 -n64
+```
+
+Bypass Tor (Direct Engines Only)
+```
+./DorXNG.py -q 'search query' -c4 -n64 --no-tor
 ```
 
 Query and Server List Iteration
